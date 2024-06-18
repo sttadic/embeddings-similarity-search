@@ -1,5 +1,10 @@
 package ie.atu.sw;
 
-public class FileIO {
+import java.io.*;
 
+public class FileIO {
+	
+	public void readFile(String path) throws IOException {
+		
+	}
 }

@@ -3,6 +3,7 @@ package ie.atu.sw;
 // Static import
 import static java.lang.System.out;
 
+import java.io.Console;
 import java.util.Scanner;
 
 public class Menu {
@@ -27,27 +28,28 @@ public class Menu {
 			// Handle invalid input. Values allowed are between 1 and 7, otherwise print
 			// error message and reprompt
 			while (true) {
+				out.print(ConsoleColour.WHITE_BOLD);
 				try {
 					choice = Integer.parseInt(scan.nextLine());
 					if (choice >= 1 && choice <= 7) {
 						break;
 					}
 					showOptions();
-					System.out.println("Invalid Selection! Please use one of the options above >");
+					System.out.println(ConsoleColour.RED + "Invalid Selection! Please use one of the options above >");
 					continue;
 				} catch (Exception e) {
 					showOptions();
-					System.out.println("Invalid Selection! Please use one of the options above >");
+					System.out.println(ConsoleColour.RED + "Invalid Selection! Please use one of the options above >");
 					continue;
 				}
 			}
 
 			switch (choice) {
-				case 1  -> setEmbeddingsPath();
-				case 2  -> outputFile();
-				case 3  -> textToCompare();
-				case 4  -> configure();
-				case 7  -> keepRunning = false;
+				case 1 -> setEmbeddingsPath();
+				case 2 -> outputFile();
+				case 3 -> textToCompare();
+				case 4 -> configure();
+				case 7 -> keepRunning = false;
 				default -> out.println("Invalid Selection!");
 			}
 		}
@@ -87,19 +89,22 @@ public class Menu {
 	}
 
 	public void showOptions() {
+		out.println(ConsoleColour.WHITE);
 		out.println("************************************************************");
 		out.println("*     ATU - Dept. of Computer Science & Applied Physics    *");
 		out.println("*                                                          *");
 		out.println("*          Similarity Search with Word Embeddings          *");
 		out.println("*                                                          *");
 		out.println("************************************************************");
-		out.println("(1) Specify Embedding File (Currently set to: " + embeddingsFilePath + ")");
+		out.println("(1) Specify Embedding File (Currently set to: " + ConsoleColour.GREEN + embeddingsFilePath
+				+ ConsoleColour.WHITE + ")");
 		out.println("(2) Specify an Output File (Currently set to: ./out.txt)");
 		out.println("(3) Enter a Word or Text");
 		out.println("(4) Configure Options");
 		out.println("(?) Optional Extras...");
-		out.println("(?) Quit Application");
+		out.println("(7) Quit Application");
 
+		out.println(ConsoleColour.WHITE_BOLD);
 		out.println("");
 		out.println("Select Option (1-?) > ");
 	}

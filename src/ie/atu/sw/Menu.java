@@ -54,13 +54,14 @@ public class Menu {
 				case 5  -> runSimilaritySearch();
 				case 6  -> keepRunning = false;
 				// Default should never be reached since input is handled within the try-catch block above
-				default -> out.println(ConsoleColour.RED + "Invalid Selection!");
+				default -> out.println(ConsoleColour.RED + "Unexpected value: " + choice);
 			}
 		}
 		out.println("Thank you for using Similarity Search with Word Embeddings application!");
+		scan.close();
 	}
 	
-	// Prompt user for a file path to the word embeddings file
+	// Prompt for a file path to the word embeddings file
 	private void setEmbeddingsPath() {
 		clearScreen();
 		out.print("Please specify the path and the name of the word embeddings file > ");
@@ -68,7 +69,7 @@ public class Menu {
 		out.println();
 	}
 	
-	// Prompt user to set an output (results of similarity search) file path
+	// Prompt for an output file path that stores results of similarity search
 	private void setOutputFile() {
 		clearScreen();
 		out.print("Please specify the path and the name of a file where results will be stored > ");

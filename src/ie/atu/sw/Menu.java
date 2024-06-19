@@ -15,6 +15,7 @@ public class Menu {
 	private String text;
 	private String distanceMetric = "Cosine Distance";
 	private FileIO fileHandler;
+	private String error;
 
 	public Menu() {
 		this.scan = new Scanner(System.in);
@@ -129,19 +130,20 @@ public class Menu {
 	private void start() {
 		// If text not specified, stop execution and show options again
 		if (text == null) {
+			error = ConsoleColour.RED + "Text to compare against the word embeddings is not specified";
 			return;
 		}
 		
 		try {
 			fileHandler.readFile(embeddingsFilePath);
 		} catch (IOException e) {
-			e.printStackTrace();
+			error = e.toString();
 		}
 		
 		try {
-			fileHandler.writeToFile(embeddingsFilePath);
+			fileHandler.writeToFile(outputFilePath);
 		} catch (IOException e) {
-			e.printStackTrace();
+			error = e.toString();
 		}
 		
 	}
@@ -179,6 +181,11 @@ public class Menu {
 		out.println(ConsoleColour.WHITE_BOLD);
 		out.println("");
 		out.println("Select Option (1-?) > ");
+		// If exists, display error message
+		if (error != null) {
+			out.println(error);
+			error = null;
+		}
 	}
 
 	/*

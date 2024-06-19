@@ -3,33 +3,32 @@ package ie.atu.sw;
 // Static import
 import static java.lang.System.out;
 
-import java.io.Console;
 import java.io.IOException;
 import java.util.Scanner;
 
 public class Menu {
 	private Scanner scan;
+	private FileIO fileHandler;
 	private boolean keepRunning = true;
 	private String embeddingsFilePath = "./word-embeddings.txt";
 	private String outputFilePath = "./output.txt";
-	private String text;
 	private String distanceMetric = "Cosine Distance";
-	private FileIO fileHandler;
-	private String error;
+	private String textToCompare;
+	private String errorMsg;
 
 	public Menu() {
+		// Initialize scan and fileHandler objects
 		this.scan = new Scanner(System.in);
 		this.fileHandler = new FileIO();
-		init();
 	}
 	
 	// Method that starts the application
-	public void init() {
+	public void startApplication() {
 		while (keepRunning) {
 			showOptions();
 			int choice = 0;
 
-			// Input handling. Values allowed 1 to 6, otherwise print error message and reprompt
+			// Input handling. Values allowed 1 to 6, otherwise print an error message and reprompt
 			while (true) {
 				out.print(ConsoleColour.WHITE_BOLD);
 				try {
@@ -52,7 +51,7 @@ public class Menu {
 				case 2  -> setOutputFile();
 				case 3  -> wordOrText();
 				case 4  -> setMetric();
-				case 5  -> start();
+				case 5  -> runSimilaritySearch();
 				case 6  -> keepRunning = false;
 				// Default should never be reached since input is handled within the try-catch block above
 				default -> out.println(ConsoleColour.RED + "Invalid Selection!");
@@ -77,7 +76,7 @@ public class Menu {
 		out.println();
 	}
 	
-	// Method that prompts for, and sets a word or short text for similarity search
+	// Method that prompts for, and sets a word or short text to be used in similarity search
 	private void wordOrText() {
 		clearScreen();
 		String input;
@@ -90,7 +89,7 @@ public class Menu {
 			}
 			break;
 		}
-		text = input;
+		textToCompare = input;
 		out.println();
 	}
 	
@@ -127,23 +126,23 @@ public class Menu {
 	}
 	
 	// Start similarity search according to specified parameters
-	private void start() {
-		// If text not specified, stop execution and show options again
-		if (text == null) {
-			error = ConsoleColour.RED + "Text to compare against the word embeddings is not specified";
+	private void runSimilaritySearch() {
+		// If text not specified, stop execution and show options with an error message
+		if (textToCompare == null) {
+			errorMsg = ConsoleColour.RED + "Text is not specified";
 			return;
 		}
 		
 		try {
 			fileHandler.readFile(embeddingsFilePath);
 		} catch (IOException e) {
-			error = e.toString();
+			errorMsg = e.toString();
 		}
 		
 		try {
 			fileHandler.writeToFile(outputFilePath);
 		} catch (IOException e) {
-			error = e.toString();
+			errorMsg = e.toString();
 		}
 		
 	}
@@ -162,15 +161,15 @@ public class Menu {
 				+ ConsoleColour.WHITE);
 		out.println("(2) Specify an Output File ----> Currently set to: " + ConsoleColour.GREEN + outputFilePath
 				+ ConsoleColour.WHITE);
-		if (text == null) {
+		if (textToCompare == null) {
 			out.println("(3) Enter a Word or Text");
 		} else {
 			out.println("(3) Enter a Word or Text   ----> Text used for similarity search: "
-					+ ConsoleColour.GREEN + text + ConsoleColour.WHITE);
+					+ ConsoleColour.GREEN + textToCompare + ConsoleColour.WHITE);
 		}
 		out.println("(4) Select Distance Metric ----> Currently selected: " + ConsoleColour.GREEN + distanceMetric
 				+ ConsoleColour.WHITE);
-		if (text == null) {
+		if (textToCompare == null) {
 			out.println(ConsoleColour.RED + "(5) SIMILARITY SEARCH (please ensure all parameters are set before proceeding)"
 					+ ConsoleColour.WHITE);
 		} else {
@@ -180,11 +179,11 @@ public class Menu {
 
 		out.println(ConsoleColour.WHITE_BOLD);
 		out.println("");
-		out.println("Select Option (1-?) > ");
+		out.println("Select Option (1-6) > ");
 		// If exists, display error message
-		if (error != null) {
-			out.println(error);
-			error = null;
+		if (errorMsg != null) {
+			out.println(errorMsg);
+			errorMsg = null;
 		}
 	}
 

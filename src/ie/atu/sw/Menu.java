@@ -4,6 +4,7 @@ package ie.atu.sw;
 import static java.lang.System.out;
 
 import java.io.Console;
+import java.io.IOException;
 import java.util.Scanner;
 
 public class Menu {
@@ -13,13 +14,11 @@ public class Menu {
 	private String outputFilePath = "./output.txt";
 	private String text;
 	private String distanceMetric = "Cosine Distance";
-	// private FileIO fileHandler;
-	// Default path to the embeddings file
-	// private static final String DEFAULT_FILE_PATH = "./word-embeddings.txt";
+	private FileIO fileHandler;
 
 	public Menu() {
 		this.scan = new Scanner(System.in);
-		// this.fileHandler = new FileIO();
+		this.fileHandler = new FileIO();
 		init();
 	}
 	
@@ -67,21 +66,9 @@ public class Menu {
 		out.print("Please specify the path and the name of the word embeddings file > ");
 		embeddingsFilePath = scan.nextLine().trim();
 		out.println();
-
-		/*
-		 * Get the file path from the user and handle possible exceptions try {
-		 * 
-		 * out.println(
-		 * "Please specify the path and the name of the embedding file. Leave blank for default (./word-embeddings.txt) > "
-		 * ); String filePath = scan.nextLine(); // Set filePath to DEFAULT_FILE_PATH if
-		 * input is empty if (filePath.trim().isEmpty()) filePath = DEFAULT_FILE_PATH;
-		 * // fileHandler.readFile(filePath.trim());
-		 * 
-		 * } catch (Exception e) { e.printStackTrace(); }
-		 */
 	}
 	
-	// Prompt user to set an output (results) file path
+	// Prompt user to set an output (results of similarity search) file path
 	private void setOutputFile() {
 		clearScreen();
 		out.print("Please specify the path and the name of a file where results will be stored > ");
@@ -89,11 +76,20 @@ public class Menu {
 		out.println();
 	}
 	
-	// Method that prompts and sets a word or short text for similarity search
+	// Method that prompts for, and sets a word or short text for similarity search
 	private void wordOrText() {
 		clearScreen();
-		out.print("Please enter a word or a short sentence to compare against word embeddings > ");
-		text = scan.nextLine().trim().toLowerCase();
+		String input;
+		while (true) {
+			out.print("Please enter a word or a short sentence to compare against word embeddings > ");
+			input = scan.nextLine().trim().toLowerCase();
+			if (input.isEmpty()) {
+				out.println(ConsoleColour.RED + "Invalid input. Please try again" + ConsoleColour.WHITE);
+				continue;
+			}
+			break;
+		}
+		text = input;
 		out.println();
 	}
 	
@@ -101,8 +97,8 @@ public class Menu {
 	private void setMetric() {
 		clearScreen();
 		out.println(ConsoleColour.WHITE_BOLD);
-		out.println("Select a Distance Metric to be used: ");
-		out.print("*******************************************");
+		out.println("Select a Distance Metric to calculate similarity between words");
+		out.print("**************************************************************");
 		out.println(ConsoleColour.WHITE);
 		out.println("(1) Dot Product");
 		out.println("(2) Euclidean Distance");
@@ -129,12 +125,25 @@ public class Menu {
 		}
 	}
 	
-	// Start with similarity search according to specified parameters
+	// Start similarity search according to specified parameters
 	private void start() {
-		// If text not specified, stop execution and reprompt options
+		// If text not specified, stop execution and show options again
 		if (text == null) {
 			return;
 		}
+		
+		try {
+			fileHandler.readFile(embeddingsFilePath);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			fileHandler.writeToFile(embeddingsFilePath);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 	// Menu options
@@ -154,10 +163,10 @@ public class Menu {
 		if (text == null) {
 			out.println("(3) Enter a Word or Text");
 		} else {
-			out.println("(3) Enter a Word or Text ------> Following text will be used for similarity search: "
+			out.println("(3) Enter a Word or Text   ----> Text used for similarity search: "
 					+ ConsoleColour.GREEN + text + ConsoleColour.WHITE);
 		}
-		out.println("(4) Specify Distance Metric ---> Currently set to: " + ConsoleColour.GREEN + distanceMetric
+		out.println("(4) Select Distance Metric ----> Currently selected: " + ConsoleColour.GREEN + distanceMetric
 				+ ConsoleColour.WHITE);
 		if (text == null) {
 			out.println(ConsoleColour.RED + "(5) SIMILARITY SEARCH (please ensure all parameters are set before proceeding)"

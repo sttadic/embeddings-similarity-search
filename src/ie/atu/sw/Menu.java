@@ -55,7 +55,8 @@ public class Menu {
 				default -> out.println(ConsoleColour.RED + "Unexpected value: " + choice);
 			}
 		}
-		out.println("Thank you for using Similarity Search with Word Embeddings application!");
+		out.println("Thank you for using Similarity Search with Word Embeddings!");
+		// Close scanner object
 		scan.close();
 	}
 	
@@ -138,6 +139,9 @@ public class Menu {
 		} catch (IOException e) {
 			errorMsg = e.toString();
 		}	
+		// Stop the application
+		out.println();
+		keepRunning = false;
 	}
 
 	// Menu options

@@ -8,7 +8,6 @@ import java.util.Scanner;
 
 public class Menu {
 	private Scanner scan;
-	private FileIO fileHandler;
 	private boolean keepRunning = true;
 	private String embeddingsFilePath = "./word-embeddings.txt";
 	private String outputFilePath = "./output.txt";
@@ -17,9 +16,8 @@ public class Menu {
 	private String errorMsg;
 
 	public Menu() {
-		// Initialize scan and fileHandler objects
+		// Instantiate Scanner object
 		this.scan = new Scanner(System.in);
-		this.fileHandler = new FileIO();
 	}
 	
 	// Method that starts the application
@@ -66,7 +64,6 @@ public class Menu {
 		clearScreen();
 		out.print("Please specify the path and the name of the word embeddings file > ");
 		embeddingsFilePath = scan.nextLine().trim();
-		out.println();
 	}
 	
 	// Prompt for an output file path that stores results of similarity search
@@ -74,7 +71,6 @@ public class Menu {
 		clearScreen();
 		out.print("Please specify the path and the name of a file where results will be stored > ");
 		outputFilePath = scan.nextLine().trim();
-		out.println();
 	}
 	
 	// Method that prompts for, and sets a word or short text to be used in similarity search
@@ -91,7 +87,6 @@ public class Menu {
 			break;
 		}
 		textToCompare = input;
-		out.println();
 	}
 	
 	// Method that defines distance metric for similarity search
@@ -105,7 +100,7 @@ public class Menu {
 		out.println("(2) Euclidean Distance");
 		out.println("(3) Cosine Distance");
 		out.println();
-
+		// Initialize metricChoice variable and handle user input
 		int metricChoice = 0;
 		while (true) {
 			out.print(ConsoleColour.WHITE_BOLD + "Select Option (1-3) > ");
@@ -126,26 +121,22 @@ public class Menu {
 		}
 	}
 	
-	// Start similarity search according to specified parameters
+	// Start similarity search based on specified parameters
 	private void runSimilaritySearch() {
-		// If text not specified, stop execution and show options with an error message
+		// If text not specified, stop execution and display an error message
 		if (textToCompare == null) {
 			errorMsg = ConsoleColour.RED + "Text is not specified";
 			return;
 		}
 		
+		// Create instance of embeddings processor
+		EmbeddingsProcessor processor = new EmbeddingsProcessor(embeddingsFilePath, outputFilePath, distanceMetric, textToCompare);
+		// Assign content of exception to the errorMsg variable to be displayed within the options menu
 		try {
-			fileHandler.readFile(embeddingsFilePath);
+			processor.start();
 		} catch (IOException e) {
 			errorMsg = e.toString();
-		}
-		
-		try {
-			fileHandler.writeToFile(outputFilePath);
-		} catch (IOException e) {
-			errorMsg = e.toString();
-		}
-		
+		}	
 	}
 
 	// Menu options
@@ -181,7 +172,7 @@ public class Menu {
 		out.println(ConsoleColour.WHITE_BOLD);
 		out.println("");
 		out.println("Select Option (1-6) > ");
-		// If exists, display error message
+		// If error exists, display message to the user and reassign null to the errorMsg variable to prevent it from reappearing
 		if (errorMsg != null) {
 			out.println(errorMsg);
 			errorMsg = null;

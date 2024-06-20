@@ -130,10 +130,11 @@ public class Menu {
 		}
 		
 		// Create instance of embeddings processor
-		EmbeddingsProcessor processor = new EmbeddingsProcessor(embeddingsFilePath, outputFilePath, distanceMetric, textToCompare);
-		// Assign content of exception to the errorMsg variable to be displayed within the options menu
+		EmbeddingsProcessor processor = new EmbeddingsProcessor();
 		try {
-			processor.start();
+			// Pass in all of the configuration variables to start processing
+			processor.start(embeddingsFilePath, outputFilePath, distanceMetric, textToCompare);
+		// Assign content of exception to the errorMsg variable to be displayed within the options menu
 		} catch (IOException e) {
 			errorMsg = e.toString();
 		}	

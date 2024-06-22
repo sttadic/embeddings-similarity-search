@@ -135,13 +135,14 @@ public class Menu {
 		try {
 			// Pass in all of the configuration variables to start processing
 			processor.start(embeddingsFilePath, outputFilePath, distanceMetric, textToCompare);
+			// Stop the application
+			out.println();
+			keepRunning = false;
 		// Assign content of exception to the errorMsg variable to be displayed within the options menu
-		} catch (IOException e) {
-			errorMsg = e.toString();
+		} catch (Exception e) {
+			errorMsg = e.getMessage();
 		}	
-		// Stop the application
-		out.println();
-		keepRunning = false;
+		
 	}
 
 	// Menu options

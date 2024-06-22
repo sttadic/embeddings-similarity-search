@@ -9,7 +9,7 @@ public class FileIO {
 			return new BufferedReader(new InputStreamReader(new FileInputStream(path)));
 		} catch (IOException e) {
 			throw new IOException(ConsoleColour.RED + "Word embeddings file " + ConsoleColour.GREEN + path
-					+ ConsoleColour.RED + " does not exist");
+					+ ConsoleColour.RED + " could not be found");
 		}
 	}
 	

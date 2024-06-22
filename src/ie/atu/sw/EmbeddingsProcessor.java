@@ -18,10 +18,18 @@ public class EmbeddingsProcessor {
 	
 	// Start with processing
 	public void start(String embeddingsFilePath, String outputFilePath, String distanceMetric, String textToCompare)
-			throws IOException {
+			throws Exception {
 		
 		BufferedReader bReader = fileHandler.readFile(embeddingsFilePath);
 		extractWordEmbeddings(bReader);
+		
+		switch (distanceMetric) {
+			case "Dot Product" 		  -> dotProduct(textToCompare);
+			case "Euclidean Distance" -> euclideanDistance(textToCompare);
+			case "Cosine Distance"	  -> cosineDistance(textToCompare);
+			default 				  -> throw new Exception(
+					ConsoleColour.RED + "Unsupported distance metric: " + ConsoleColour.GREEN + distanceMetric);
+		}
 		
 	}
 	
@@ -38,5 +46,20 @@ public class EmbeddingsProcessor {
 			}
 			i++;
 		}
+	}
+	
+	// Calculate Dot Product
+	private double dotProduct(String text) {
+		return 0;
+	}
+	
+	// Calculate Euclidean Distance
+	private double euclideanDistance(String text) {
+		return 0;
+	}
+	
+	// Calculate Cosine Distance
+	private double cosineDistance(String text) {
+		return 0;
 	}
 }

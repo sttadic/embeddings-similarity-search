@@ -8,7 +8,7 @@ public class Menu {
 	private boolean keepRunning = true;
 	private String embeddingsFilePath = "./word-embeddings.txt";
 	private String outputFilePath = "./output.txt";
-	private String distanceMetric = "Cosine Distance";
+	private String metric = "Cosine Distance";
 	private String textToCompare;
 	private String errorMsg;
 
@@ -52,6 +52,7 @@ public class Menu {
 				default -> out.println(ConsoleColour.RED + "Unexpected value: " + choice);
 			}
 		}
+		// Application closed. Display goodbye message
 		out.println("Thank you for using Similarity Search with Word Embeddings!");
 		// Close scanner object
 		scan.close();
@@ -87,11 +88,11 @@ public class Menu {
 		textToCompare = input;
 	}
 	
-	// Method that defines distance metric for similarity search
+	// Method that defines measure to be used for similarity search
 	private void setMetric() {
 		clearScreen();
 		out.println(ConsoleColour.WHITE_BOLD);
-		out.println("Select a Distance Metric to calculate similarity between words");
+		out.println("Select a Metric to calculate similarity between words");
 		out.print("**************************************************************");
 		out.println(ConsoleColour.WHITE);
 		out.println("(1) Dot Product");
@@ -112,10 +113,11 @@ public class Menu {
 				continue;
 			}
 		}
+		// Set the metric based on user input
 		switch (metricChoice) {
-			case 1  -> distanceMetric = "Dot Product";
-			case 2  -> distanceMetric = "Euclidean Distance";
-			default -> distanceMetric = "Cosine Distance";
+			case 1  -> metric = "Dot Product";
+			case 2  -> metric = "Euclidean Distance";
+			default -> metric = "Cosine Distance";
 		}
 	}
 	
@@ -127,19 +129,19 @@ public class Menu {
 			return;
 		}
 		
-		// Create instance of embeddings processor
+		// Create instance of 'EmbeddingsProcessor'
 		EmbeddingsProcessor processor = new EmbeddingsProcessor();
+		
 		try {
 			// Pass in all of the configuration variables to start processing
-			processor.start(embeddingsFilePath, outputFilePath, distanceMetric, textToCompare);
+			processor.start(embeddingsFilePath, outputFilePath, metric, textToCompare);
 			// Stop the application
 			out.println();
 			keepRunning = false;
-		// Assign content of exception to the errorMsg variable to be displayed within the options menu
+		// Assign content of the exception to the 'errorMsg' variable displayed within the options menu
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 		}	
-		
 	}
 
 	// Menu options
@@ -162,7 +164,7 @@ public class Menu {
 			out.println("(3) Enter a Word or Text   ----> Text used for similarity search: "
 					+ ConsoleColour.GREEN + textToCompare + ConsoleColour.WHITE);
 		}
-		out.println("(4) Select Distance Metric ----> Currently selected: " + ConsoleColour.GREEN + distanceMetric
+		out.println("(4) Select Distance Metric ----> Currently selected: " + ConsoleColour.GREEN + metric
 				+ ConsoleColour.WHITE);
 		if (textToCompare == null) {
 			out.println(ConsoleColour.RED + "(5) SIMILARITY SEARCH (please ensure all parameters are set before proceeding)"
@@ -175,7 +177,7 @@ public class Menu {
 		out.println(ConsoleColour.WHITE_BOLD);
 		out.println("");
 		out.println("Select Option (1-6) > ");
-		// If error exists, display message to the user and reassign null to the errorMsg variable to prevent it from reappearing
+		// If error exists, display message and reassign null to the 'errorMsg' variable to prevent it from reappearing
 		if (errorMsg != null) {
 			out.println(errorMsg);
 			errorMsg = null;

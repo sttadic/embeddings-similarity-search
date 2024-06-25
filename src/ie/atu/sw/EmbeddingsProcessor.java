@@ -18,23 +18,25 @@ public class EmbeddingsProcessor {
 	}
 	
 	// Start with processing
-	public void start(String embeddingsFilePath, String outputFilePath, String distanceMetric, String textToCompare)
+	public void start(String embeddingsFilePath, String outputFilePath, String metric, String textToCompare)
 			throws Exception {
 		
+		// Open a BufferedReader to read the embeddings file, extract word embeddings and close the input stream
 		BufferedReader bReader = fileHandler.readFile(embeddingsFilePath);
 		extractWordEmbeddings(bReader);
 		bReader.close();
 		
-		switch (distanceMetric) {
+		// Invoke particular method according to the metric passed in. Throw exception in case of unsupported one
+		switch (metric) {
 			case "Dot Product" 		  -> dotProduct(textToCompare);
 			case "Euclidean Distance" -> euclideanDistance(textToCompare);
 			case "Cosine Distance"	  -> cosineDistance(textToCompare);
 			default 				  -> throw new Exception(
-					ConsoleColour.RED + "Unsupported distance metric: " + ConsoleColour.GREEN + distanceMetric);
+					ConsoleColour.RED + "Unsupported distance metric: " + ConsoleColour.GREEN + metric);
 		}
 	}
 	
-	// Extract elements from each line of input stream and store into relevant array
+	// Extract elements from each line of input stream and store them into relevant arrays
 	private void extractWordEmbeddings(BufferedReader br) throws IOException {
 		int i = 0;
 		String line = null;
@@ -51,41 +53,40 @@ public class EmbeddingsProcessor {
 	
 	// Calculate Dot Product
 	private void dotProduct(String text) throws Exception {
+		// Word not found in 'words' array
 		int indexOfText = embVectorOfInput(text);
 		if (indexOfText == -1) {
 			throw new Exception(ConsoleColour.RED + "No matching word in embeddings. Please try another word");
 		}
-
 		
-		double[] topScores = new double[10];
-		Arrays.fill(topScores, Double.NEGATIVE_INFINITY);
+		// Initialize arrays to store top matching scores and related words
 		String[] topWords = new String[10];
+		double[] topScores = new double[10];
+		// Populate 'topScores' array with negative infinity so it can initially be filled with 10 larger elements
+		Arrays.fill(topScores, Double.NEGATIVE_INFINITY);
 		
-		// Iterate over whole embeddings array (same number of elements as MAX_WORDS constant = 59602)
+		// Iterate over an 'embeddings' array
 		for (int i = 0; i < MAX_WORDS; i++) {
-			// Skip the vector of user inputted word (it is to be compared with all other 59601 words)
+			// Skip the vector related to user inputted word - not to be compared with itself
 			if (indexOfText == i) {
 				continue;
 			}
+			// Initialize similarityScore variable and reset it on each iteration
 			double similarityScore = 0;
-			// Calculate similarity score
+			// Iterate over embeddings of a particular word and calculate similarity score
 			for (int j = 0; j < VECTOR_DIMENSION; j++) {
 				similarityScore += embeddings[indexOfText][j] * embeddings[i][j];
 			}
 			
-			// If similarity score is larger than the smallest element of arrScores (always first element)
+			// If similarity score is larger than the smallest element (first element) of the 'topScores' array
 			if (similarityScore > topScores[0]) {
-				// Insert score and new word into a proper place of topScores and topWords arrays
+				// Insert the score and a related word into a proper place in 'topScores' and 'topWords' arrays
 				insertIntoArray(topScores, topWords, similarityScore, words[i]);
 			}
 		}
-		// Print top 10 most similar words
-		for (String n: topWords) {
-			System.out.println(n);
-		}
 	}
 	
-	// Insert score into the arrays and keep them sorted so words would point to their respective scores
+	// Insert simirlatiy scores and words into new arrays in sorted order
 	private void insertIntoArray(double[] arrScores, String[] arrWords, double newScore, String newWord) {
 		
 		int i;
@@ -108,7 +109,7 @@ public class EmbeddingsProcessor {
 		return 0;
 	}
 	
-	// Returns index of words array that holds embeddings of a user inputted word
+	// Returns index of an element (user inputted word) from a 'words' array. Return -1 if word not found
 	private int embVectorOfInput(String t) {
 		for (int i = 0; i < words.length; i++) {
 			if (t.equals(words[i])) {

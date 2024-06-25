@@ -112,8 +112,8 @@ public class Menu {
 	private void setMeasure() {
 		clearScreen();
 		out.println(ConsoleColour.WHITE_BOLD);
-		out.println("Select a method used to find the closest matches to your input (word or text)");
-		out.print("**************************************************************");
+		out.println("Select a method you would like to use to find the closest matches to your input");
+		out.print("*******************************************************************************");
 		out.println(ConsoleColour.WHITE);
 		out.println("(1) Dot Product");
 		out.println("(2) Euclidean Distance");
@@ -147,10 +147,10 @@ public class Menu {
 		int userInput;
 		while (true) {
 			out.println(ConsoleColour.WHITE);
-			out.print("Specify the number of top mathes to be displayed (1 - 20) > ");
+			out.print("Specify the number of top mathes to be displayed (1 - 100) > ");
 			try {
 				userInput = Integer.parseInt(scan.nextLine());
-				if (userInput >= 1 && userInput <= 20) {
+				if (userInput >= 1 && userInput <= 100) {
 					break;
 				}
 				out.println(ConsoleColour.RED + "Invalid value. Please try again");

@@ -9,6 +9,7 @@ public class EmbeddingsProcessor {
 	private static final int MAX_WORDS = 59_602;
 	private String[] words;
 	private double[][] embeddings;
+	private int numOfMatches;
 	
 	// Initialize file handler and allocate memory for words and embeddings arrays
 	public EmbeddingsProcessor() {
@@ -26,7 +27,10 @@ public class EmbeddingsProcessor {
 		extractWordEmbeddings(bReader);
 		bReader.close();
 		
-		// Invoke particular method according to the metric passed in. Throw exception in case of unsupported one
+		// Set number of top matches to be stored
+		this.numOfMatches = numOfMatches;
+		
+		// Invoke particular method based on measure parameter. Throw exception in case of unsupported one
 		switch (measure) {
 			case "Dot Product" 		  -> dotProduct(textToCompare);
 			case "Euclidean Distance" -> euclideanDistance(textToCompare);
@@ -59,9 +63,9 @@ public class EmbeddingsProcessor {
 		}
 		
 		// Initialize arrays to store top matching scores and related words
-		String[] topWords = new String[10];
-		double[] topScores = new double[10];
-		// Populate 'topScores' array with negative infinity so it can initially be filled with 10 larger elements
+		String[] topWords = new String[numOfMatches];
+		double[] topScores = new double[numOfMatches];
+		// Populate 'topScores' with -infinity so it can initially be filled with 'numOfMatches' larger elements
 		Arrays.fill(topScores, Double.NEGATIVE_INFINITY);
 		
 		// Iterate over an 'embeddings' array

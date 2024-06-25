@@ -8,7 +8,7 @@ public class Menu {
 	private boolean keepRunning = true;
 	private String embeddingsFilePath = "./word-embeddings.txt";
 	private String outputFilePath = "./output.txt";
-	private String metric = "Cosine Similarity";
+	private String measure = "Cosine Similarity";
 	private String textToCompare;
 	private int numOfMatches = 10;
 	private String errorMsg;
@@ -22,7 +22,7 @@ public class Menu {
 	public void startApplication() {
 		while (keepRunning) {
 			int choice;
-			// Input handling. Values allowed 1 to 7, otherwise print an error message and reprompt
+			// Input handling. Values allowed 1 to 7, otherwise set an error message and reprompt
 			while (true) {
 				showOptions();
 				try {
@@ -30,13 +30,11 @@ public class Menu {
 					if (choice >= 1 && choice <= 7) {
 						break;
 					}
-					errorMsg = ConsoleColour.RED + "Invalid Selection! Please use one of the options above >"
-							+ ConsoleColour.WHITE;
+					errorMsg = "Invalid Selection! Please use one of the options above";
 					continue;
 				} catch (Exception e) {
 					showOptions();
-					errorMsg = ConsoleColour.RED + "Invalid Selection! Please use one of the options above >"
-							+ ConsoleColour.WHITE;
+					errorMsg = "Invalid Selection! Please use one of the options above";
 					continue;
 				}
 			}
@@ -62,31 +60,52 @@ public class Menu {
 	// Prompt for a file path to the word embeddings file
 	private void setEmbeddingsPath() {
 		clearScreen();
-		out.print("Please specify the path and the name of the word embeddings file > ");
-		embeddingsFilePath = scan.nextLine().trim();
+		String userInput;
+		while (true) {
+			out.println(ConsoleColour.WHITE);
+			out.print("Please specify the path and the name of the word embeddings file > ");
+			userInput = scan.nextLine().trim();
+			if (userInput.isEmpty()) {
+				out.println(ConsoleColour.RED + "Invalid input! Please try again.");
+				continue;
+			}
+			break;
+		}
+		embeddingsFilePath = userInput;
 	}
 	
 	// Prompt for an output file path that stores results of similarity search
 	private void setOutputFile() {
 		clearScreen();
-		out.print("Please specify the path and the name of a file where results will be stored > ");
-		outputFilePath = scan.nextLine().trim();
+		String userInput;
+		while (true) {
+			out.println(ConsoleColour.WHITE);
+			out.print("Please specify the path and the name of a file where results will be stored > ");
+			userInput = scan.nextLine().trim();
+			if (userInput.isEmpty()) {
+				out.println(ConsoleColour.RED + "Invalid input! Please try again.");
+				continue;
+			}
+			break;
+		}
+		outputFilePath = userInput;
 	}
 	
 	// Method that prompts for, and sets a word or short text to be used in similarity search
 	private void wordOrText() {
 		clearScreen();
-		String input;
+		String userInput;
 		while (true) {
+			out.println(ConsoleColour.WHITE);
 			out.print("Please enter a word or a short sentence to compare against word embeddings > ");
-			input = scan.nextLine().trim().toLowerCase();
-			if (input.isEmpty()) {
-				out.println(ConsoleColour.RED + "Invalid input. Please try again" + ConsoleColour.WHITE);
+			userInput = scan.nextLine().trim().toLowerCase();
+			if (userInput.isEmpty()) {
+				out.println(ConsoleColour.RED + "Invalid input! Please try again.");
 				continue;
 			}
 			break;
 		}
-		textToCompare = input;
+		textToCompare = userInput;
 	}
 	
 	// Method that defines measure to be used for similarity search
@@ -100,25 +119,25 @@ public class Menu {
 		out.println("(2) Euclidean Distance");
 		out.println("(3) Cosine Similarity");
 		out.println();
-		// Initialize methodChoice variable and handle user input
-		int methodChoice = 0;
+		// Initialize measureChoice variable and handle user input
+		int measureChoice = 0;
 		while (true) {
 			out.print(ConsoleColour.WHITE_BOLD + "Select Option (1-3) > ");
 			try {
-				methodChoice = Integer.parseInt(scan.nextLine());
-				if (methodChoice >= 1 && methodChoice <= 3)
+				measureChoice = Integer.parseInt(scan.nextLine());
+				if (measureChoice >= 1 && measureChoice <= 3)
 					break;
-				out.println(ConsoleColour.RED + "Invalid input, please try again!");
+				out.println(ConsoleColour.RED + "Invalid input! Please try again.");
 			} catch (Exception e) {
-				out.println(ConsoleColour.RED + "Invalid input, please try again!");
+				out.println(ConsoleColour.RED + "Invalid input! Please try again.");
 				continue;
 			}
 		}
-		// Set the metric based on user input
-		switch (methodChoice) {
-			case 1  -> metric = "Dot Product";
-			case 2  -> metric = "Euclidean Distance";
-			default -> metric = "Cosine Similarity";
+		// Set the measure based on user input
+		switch (measureChoice) {
+			case 1  -> measure = "Dot Product";
+			case 2  -> measure = "Euclidean Distance";
+			default -> measure = "Cosine Similarity";
 		}
 	}
 	
@@ -127,7 +146,7 @@ public class Menu {
 		clearScreen();
 		int userInput;
 		while (true) {
-			out.print(ConsoleColour.WHITE);
+			out.println(ConsoleColour.WHITE);
 			out.print("Specify the number of top mathes to be displayed (1 - 20) > ");
 			try {
 				userInput = Integer.parseInt(scan.nextLine());
@@ -147,7 +166,7 @@ public class Menu {
 	private void runSimilaritySearch() {
 		// If text not specified, stop execution and display an error message
 		if (textToCompare == null) {
-			errorMsg = ConsoleColour.RED + "Text is not specified";
+			errorMsg = "Text is not specified";
 			return;
 		}
 		
@@ -155,8 +174,8 @@ public class Menu {
 		EmbeddingsProcessor processor = new EmbeddingsProcessor();
 		
 		try {
-			// Pass in all of the configuration variables to start processing
-			processor.start(embeddingsFilePath, outputFilePath, metric, textToCompare, numOfMatches);
+			// Pass in all configuration variables to start processing
+			processor.start(embeddingsFilePath, outputFilePath, measure, textToCompare, numOfMatches);
 			// Stop the application
 			out.println();
 			keepRunning = false;
@@ -190,7 +209,7 @@ public class Menu {
 					+ ConsoleColour.GREEN + textToCompare + ConsoleColour.WHITE);
 		}
 		// Display measure used for comparison
-		out.println("(4) Select Distance Measure ----> Currently selected: " + ConsoleColour.GREEN + metric
+		out.println("(4) Select Distance Measure ----> Currently selected: " + ConsoleColour.GREEN + measure
 				+ ConsoleColour.WHITE);
 		// Number of matches option
 		out.println("(5) Number of Top Matches   ----> Currently set to: " + ConsoleColour.GREEN + numOfMatches
@@ -211,19 +230,18 @@ public class Menu {
 		out.println("Select Option (1-7) > ");
 		// If error, display message and reassign null to the 'errorMsg' variable to prevent it from reappearing
 		if (errorMsg != null) {
-			out.println(errorMsg);
+			out.println(ConsoleColour.RED + errorMsg + ConsoleColour.WHITE);
 			errorMsg = null;
 		}
 	}
 
 	/*
 	 * Source: https://intellipaat.com/community/294/java-clear-the-console
-	 * Modified to, along with clearing terminal window, resets colour to white (in case of errors) 
+	 * Clears terminal window (doesn't work for IDE console)
 	 */
 	private void clearScreen() {
 		out.print("\033[H\033[2J");
 		out.flush();
-		out.print(ConsoleColour.WHITE);
 	}
 
 }

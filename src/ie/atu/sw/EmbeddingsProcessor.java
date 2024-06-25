@@ -31,8 +31,7 @@ public class EmbeddingsProcessor {
 			case "Dot Product" 		  -> dotProduct(textToCompare);
 			case "Euclidean Distance" -> euclideanDistance(textToCompare);
 			case "Cosine Distance"	  -> cosineDistance(textToCompare);
-			default 				  -> throw new Exception(
-					ConsoleColour.RED + "Unsupported distance metric: " + ConsoleColour.GREEN + measure);
+			default 				  -> throw new Exception("Unsupported method: " + measure);
 		}
 	}
 	
@@ -56,7 +55,7 @@ public class EmbeddingsProcessor {
 		// Word not found in 'words' array
 		int indexOfText = embVectorOfInput(text);
 		if (indexOfText == -1) {
-			throw new Exception(ConsoleColour.RED + "No matching word in embeddings. Please try another word");
+			throw new Exception("No matching word in embeddings. Please try another word");
 		}
 		
 		// Initialize arrays to store top matching scores and related words

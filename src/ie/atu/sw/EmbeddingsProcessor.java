@@ -18,7 +18,7 @@ public class EmbeddingsProcessor {
 	}
 	
 	// Start with processing
-	public void start(String embeddingsFilePath, String outputFilePath, String metric, String textToCompare)
+	public void start(String embeddingsFilePath, String outputFilePath, String measure, String textToCompare, int numOfMatches)
 			throws Exception {
 		
 		// Open a BufferedReader to read the embeddings file, extract word embeddings and close the input stream
@@ -27,12 +27,12 @@ public class EmbeddingsProcessor {
 		bReader.close();
 		
 		// Invoke particular method according to the metric passed in. Throw exception in case of unsupported one
-		switch (metric) {
+		switch (measure) {
 			case "Dot Product" 		  -> dotProduct(textToCompare);
 			case "Euclidean Distance" -> euclideanDistance(textToCompare);
 			case "Cosine Distance"	  -> cosineDistance(textToCompare);
 			default 				  -> throw new Exception(
-					ConsoleColour.RED + "Unsupported distance metric: " + ConsoleColour.GREEN + metric);
+					ConsoleColour.RED + "Unsupported distance metric: " + ConsoleColour.GREEN + measure);
 		}
 	}
 	

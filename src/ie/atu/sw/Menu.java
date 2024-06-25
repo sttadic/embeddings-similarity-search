@@ -8,8 +8,9 @@ public class Menu {
 	private boolean keepRunning = true;
 	private String embeddingsFilePath = "./word-embeddings.txt";
 	private String outputFilePath = "./output.txt";
-	private String metric = "Cosine Distance";
+	private String metric = "Cosine Similarity";
 	private String textToCompare;
+	private int numOfMatches = 10;
 	private String errorMsg;
 
 	public Menu() {
@@ -20,23 +21,22 @@ public class Menu {
 	// Method that starts the application
 	public void startApplication() {
 		while (keepRunning) {
-			showOptions();
-			int choice = 0;
-
-			// Input handling. Values allowed 1 to 6, otherwise print an error message and reprompt
+			int choice;
+			// Input handling. Values allowed 1 to 7, otherwise print an error message and reprompt
 			while (true) {
-				out.print(ConsoleColour.WHITE_BOLD);
+				showOptions();
 				try {
 					choice = Integer.parseInt(scan.nextLine());
-					if (choice >= 1 && choice <= 6) {
+					if (choice >= 1 && choice <= 7) {
 						break;
 					}
-					showOptions();
-					out.println(ConsoleColour.RED + "Invalid Selection! Please use one of the options above >");
+					errorMsg = ConsoleColour.RED + "Invalid Selection! Please use one of the options above >"
+							+ ConsoleColour.WHITE;
 					continue;
 				} catch (Exception e) {
 					showOptions();
-					out.println(ConsoleColour.RED + "Invalid Selection! Please use one of the options above >");
+					errorMsg = ConsoleColour.RED + "Invalid Selection! Please use one of the options above >"
+							+ ConsoleColour.WHITE;
 					continue;
 				}
 			}
@@ -45,9 +45,10 @@ public class Menu {
 				case 1  -> setEmbeddingsPath();
 				case 2  -> setOutputFile();
 				case 3  -> wordOrText();
-				case 4  -> setMetric();
-				case 5  -> runSimilaritySearch();
-				case 6  -> keepRunning = false;
+				case 4  -> setMeasure();
+				case 5  -> setMatches();
+				case 6  -> runSimilaritySearch();
+				case 7  -> keepRunning = false;
 				// Default should never be reached since input is handled within the try-catch block above
 				default -> out.println(ConsoleColour.RED + "Unexpected value: " + choice);
 			}
@@ -89,23 +90,23 @@ public class Menu {
 	}
 	
 	// Method that defines measure to be used for similarity search
-	private void setMetric() {
+	private void setMeasure() {
 		clearScreen();
 		out.println(ConsoleColour.WHITE_BOLD);
-		out.println("Select a Metric to calculate similarity between words");
+		out.println("Select a method used to find the closest matches to your input (word or text)");
 		out.print("**************************************************************");
 		out.println(ConsoleColour.WHITE);
 		out.println("(1) Dot Product");
 		out.println("(2) Euclidean Distance");
-		out.println("(3) Cosine Distance");
+		out.println("(3) Cosine Similarity");
 		out.println();
-		// Initialize metricChoice variable and handle user input
-		int metricChoice = 0;
+		// Initialize methodChoice variable and handle user input
+		int methodChoice = 0;
 		while (true) {
 			out.print(ConsoleColour.WHITE_BOLD + "Select Option (1-3) > ");
 			try {
-				metricChoice = Integer.parseInt(scan.nextLine());
-				if (metricChoice >= 1 && metricChoice <= 3)
+				methodChoice = Integer.parseInt(scan.nextLine());
+				if (methodChoice >= 1 && methodChoice <= 3)
 					break;
 				out.println(ConsoleColour.RED + "Invalid input, please try again!");
 			} catch (Exception e) {
@@ -114,11 +115,32 @@ public class Menu {
 			}
 		}
 		// Set the metric based on user input
-		switch (metricChoice) {
+		switch (methodChoice) {
 			case 1  -> metric = "Dot Product";
 			case 2  -> metric = "Euclidean Distance";
-			default -> metric = "Cosine Distance";
+			default -> metric = "Cosine Similarity";
 		}
+	}
+	
+	// Set number of top matches
+	private void setMatches() {
+		clearScreen();
+		int userInput;
+		while (true) {
+			out.print(ConsoleColour.WHITE);
+			out.print("Specify the number of top mathes to be displayed (1 - 20) > ");
+			try {
+				userInput = Integer.parseInt(scan.nextLine());
+				if (userInput >= 1 && userInput <= 20) {
+					break;
+				}
+				out.println(ConsoleColour.RED + "Invalid value. Please try again");
+				
+			} catch (Exception e) {
+				out.println(ConsoleColour.RED + "Invalid value. Please try again");
+			}
+		}
+		numOfMatches = userInput;
 	}
 	
 	// Start similarity search based on specified parameters
@@ -134,7 +156,7 @@ public class Menu {
 		
 		try {
 			// Pass in all of the configuration variables to start processing
-			processor.start(embeddingsFilePath, outputFilePath, metric, textToCompare);
+			processor.start(embeddingsFilePath, outputFilePath, metric, textToCompare, numOfMatches);
 			// Stop the application
 			out.println();
 			keepRunning = false;
@@ -154,30 +176,40 @@ public class Menu {
 		out.println("*          Similarity Search with Word Embeddings          *");
 		out.println("*                                                          *");
 		out.println("************************************************************");
-		out.println("(1) Specify Embedding File ----> Currently set to: " + ConsoleColour.GREEN + embeddingsFilePath
+		// Display input file
+		out.println("(1) Specify Embedding File  ----> Currently set to: " + ConsoleColour.GREEN + embeddingsFilePath
 				+ ConsoleColour.WHITE);
-		out.println("(2) Specify an Output File ----> Currently set to: " + ConsoleColour.GREEN + outputFilePath
+		// Display output file
+		out.println("(2) Specify an Output File  ----> Currently set to: " + ConsoleColour.GREEN + outputFilePath
 				+ ConsoleColour.WHITE);
+		// If set, show text used for similarity search
 		if (textToCompare == null) {
 			out.println("(3) Enter a Word or Text");
 		} else {
-			out.println("(3) Enter a Word or Text   ----> Text used for similarity search: "
+			out.println("(3) Enter a Word or Text    ----> Text used for similarity search: "
 					+ ConsoleColour.GREEN + textToCompare + ConsoleColour.WHITE);
 		}
-		out.println("(4) Select Distance Metric ----> Currently selected: " + ConsoleColour.GREEN + metric
+		// Display measure used for comparison
+		out.println("(4) Select Distance Measure ----> Currently selected: " + ConsoleColour.GREEN + metric
 				+ ConsoleColour.WHITE);
+		// Number of matches option
+		out.println("(5) Number of Top Matches   ----> Currently set to: " + ConsoleColour.GREEN + numOfMatches
+				+ ConsoleColour.WHITE);
+		// Option to start similarity search (coloured red if text not set yet)
 		if (textToCompare == null) {
-			out.println(ConsoleColour.RED + "(5) SIMILARITY SEARCH (please ensure all parameters are set before proceeding)"
+			out.println(ConsoleColour.RED
+					+ "(6) START SIMILARITY SEARCH (please ensure all parameters are set before proceeding)"
 					+ ConsoleColour.WHITE);
 		} else {
-			out.println("(5) SIMILARITY SEARCH");
+			out.println("(6) START SIMILARITY SEARCH");
 		}
-		out.println("(6) Quit");
+		// Quit option
+		out.println("(7) Quit");
 
 		out.println(ConsoleColour.WHITE_BOLD);
 		out.println("");
-		out.println("Select Option (1-6) > ");
-		// If error exists, display message and reassign null to the 'errorMsg' variable to prevent it from reappearing
+		out.println("Select Option (1-7) > ");
+		// If error, display message and reassign null to the 'errorMsg' variable to prevent it from reappearing
 		if (errorMsg != null) {
 			out.println(errorMsg);
 			errorMsg = null;
@@ -185,12 +217,13 @@ public class Menu {
 	}
 
 	/*
-	 * Method that clears terminal window (doesn't work in IDE console) 
 	 * Source: https://intellipaat.com/community/294/java-clear-the-console
+	 * Modified to, along with clearing terminal window, resets colour to white (in case of errors) 
 	 */
 	private void clearScreen() {
 		out.print("\033[H\033[2J");
 		out.flush();
+		out.print(ConsoleColour.WHITE);
 	}
 
 }

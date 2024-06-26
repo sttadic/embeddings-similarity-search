@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 public class EmbeddingsProcessor {
 	private FileIO fileHandler;
+	private FileWriter out;
 	private static final int VECTOR_DIMENSION = 50;
 	private static final int MAX_WORDS = 59_602;
 	private String[] words;
@@ -29,21 +30,22 @@ public class EmbeddingsProcessor {
 		
 		// Set number of top matches to be stored
 		this.numOfMatches = numOfMatches;
-		
+		out = new FileWriter(outputFilePath);
 		// Invoke particular method based on measure parameter. Throw exception in case of unsupported one
 		switch (measure) {
 			case "Dot Product" 		  -> dotProduct(textToCompare);
 			case "Euclidean Distance" -> euclideanDistance(textToCompare);
-			case "Cosine Distance"	  -> cosineDistance(textToCompare);
+			case "Cosine Similarity"  -> cosineSimilarity(textToCompare);
 			default 				  -> throw new Exception("Unsupported method: " + measure);
 		}
+		out.close();
+		
 	}
 	
 	// Extract elements from each line of input stream and store them into relevant arrays
 	private void extractWordEmbeddings(BufferedReader br) throws IOException {
 		int i = 0;
 		String line = null;
-		
 		while ((line = br.readLine()) != null) {
 			String[] parts = line.trim().split(",");
 			words[i] = parts[0];
@@ -54,13 +56,21 @@ public class EmbeddingsProcessor {
 		}
 	}
 	
-	private void processResults(String[] topWords, double[] topScores) {
+	// Print and write results to the file
+	private void printAndWrite(String s) throws IOException  {
+		System.out.print(s);
+		out.write(s);
+	}
+	
+	// Process and format results
+	private void processResults(String[] topWords, double[] topScores) throws IOException {
 		System.out.println();
-		System.out.println("--------------------------------------------------");
-		System.out.println("   Top Matching Words    |    Similarity Scores");
-		System.out.println("-------------------------|------------------------");
+		printAndWrite("--------------------------------------------------\n");
+		printAndWrite("   Top Matching Words    |    Similarity Scores\n");
+		printAndWrite("-------------------------|------------------------\n");
 		for (int i = topWords.length - 1; i >= 0; i--) {
-			System.out.printf("%3s%-22s%-5s%s%n", "", topWords[i], "|", topScores[i]);	
+			String s = String.format("%3s%-22s%-5s%s%n", "", topWords[i], "|", topScores[i]);
+			printAndWrite(s);
 		}
 	}
 	
@@ -118,8 +128,8 @@ public class EmbeddingsProcessor {
 		return 0;
 	}
 	
-	// Calculate Cosine Distance
-	private double cosineDistance(String text) {
+	// Calculate Cosine Similarity
+	private double cosineSimilarity(String text) {
 		return 0;
 	}
 	

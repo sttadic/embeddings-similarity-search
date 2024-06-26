@@ -3,7 +3,7 @@ package ie.atu.sw;
 import java.io.*;
 
 public class FileIO {
-	
+	// Handle file input using instance of BufferedReader
 	public BufferedReader readFile(String path) throws IOException {
 		try {
 			return new BufferedReader(new InputStreamReader(new FileInputStream(path)));
@@ -11,9 +11,12 @@ public class FileIO {
 			throw new IOException("Word embeddings file '" +  path + "' cannot be found!");
 		}
 	}
-	
-	public void writeToFile(String path) throws IOException {
-		throw new IOException("Error creating '" + path + "'!");
-		
+	// Writing to the output stream
+	public FileWriter writeToFile(String path) throws IOException {
+		try {
+			return new FileWriter(path);
+		} catch (IOException e) {
+			throw new IOException("Error creating '" + path + "'!");
+		}
 	}
 }

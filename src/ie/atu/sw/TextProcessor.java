@@ -34,8 +34,14 @@ public class TextProcessor {
 		return null;
 	}
 	
+	// Returns index of a word within embeddings array, -2 if word not in embeddings
 	private int getIndex() {
-		return 1;
+		for (int i = 0; i < words.length; i++) {
+			if (text.equals(words[i])) {
+				return i;
+			}
+		}
+		return -2;
 	}
 	
 	private double[] averageVector() {

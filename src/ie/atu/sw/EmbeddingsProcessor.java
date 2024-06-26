@@ -31,16 +31,21 @@ public class EmbeddingsProcessor {
 		TextProcessor tp = new TextProcessor(textToCompare, words, embeddings);
 		VectorIndexPair pair = tp.processText();
 		double[] vector = pair.vector();
-		int index = pair.index();
+		int indexOfWord = pair.index();
 		
+		// Thorw an exception to be diplayed as an error message if word is not found in embeddings
+		if (indexOfWord == -2) {
+			throw new Exception("The word '" + textToCompare
+					+ "' could not be found in embeddings! Please try another word or check your spelling");
+		}
 		// Set the output stream file path
 		out = fileHandler.writeToFile(outputFilePath);
 		
 		// Invoke particular method based on measure parameter. Throw exception in case of unsupported one
 		switch (measure) {
-			case "Dot Product" 		  -> dotProduct(textToCompare, numOfMatches);
-			case "Euclidean Distance" -> euclideanDistance(textToCompare, numOfMatches);
-			case "Cosine Similarity"  -> cosineSimilarity(textToCompare, numOfMatches);
+			case "Dot Product" 		  -> dotProduct(textToCompare, numOfMatches, indexOfWord);
+			case "Euclidean Distance" -> euclideanDistance(textToCompare, numOfMatches, indexOfWord);
+			case "Cosine Similarity"  -> cosineSimilarity(textToCompare, numOfMatches, indexOfWord);
 			default 				  -> throw new Exception("Unsupported method: " + measure);
 		}
 		// Close output stream
@@ -81,14 +86,7 @@ public class EmbeddingsProcessor {
 	}
 	
 	// Calculate Dot Product
-	private void dotProduct(String text, int numOfMatches) throws Exception {
-		// Word not found in 'words' array
-		int indexOfText = embVectorOfInput(text);
-		if (indexOfText == -1) {
-			throw new Exception("The word '" + text
-					+ "' could not be found in embeddings! Please try another word or check your spelling.");
-		}
-		
+	private void dotProduct(String text, int numOfMatches, int indexOfWord) throws Exception {
 		// Initialize arrays to store top matching scores and related words
 		String[] topWords = new String[numOfMatches];
 		double[] topScores = new double[numOfMatches];
@@ -98,14 +96,14 @@ public class EmbeddingsProcessor {
 		// Iterate over an 'embeddings' array
 		for (int i = 0; i < MAX_WORDS; i++) {
 			// Skip the vector related to user inputted word - not to be compared with itself
-			if (indexOfText == i) {
+			if (indexOfWord== i) {
 				continue;
 			}
 			// Initialize similarityScore variable and reset it on each iteration
 			double similarityScore = 0;
 			// Iterate over embeddings of a particular word and calculate similarity score
 			for (int j = 0; j < VECTOR_DIMENSION; j++) {
-				similarityScore += embeddings[indexOfText][j] * embeddings[i][j];
+				similarityScore += embeddings[indexOfWord][j] * embeddings[i][j];
 			}
 			
 			// If similarity score is larger than the smallest element (first element) of the 'topScores' array
@@ -131,22 +129,12 @@ public class EmbeddingsProcessor {
 	}
 	
 	// Calculate Euclidean Distance
-	private double euclideanDistance(String text, int numOfMatches) {
+	private double euclideanDistance(String text, int numOfMatches, int indexOfWord) {
 		return 0;
 	}
 	
 	// Calculate Cosine Similarity
-	private double cosineSimilarity(String text, int numOfMatches) {
+	private double cosineSimilarity(String text, int numOfMatches, int indexOfWord) {
 		return 0;
-	}
-	
-	// Returns index of an element (user inputted word) from a 'words' array. Return -1 if word not found
-	private int embVectorOfInput(String t) {
-		for (int i = 0; i < words.length; i++) {
-			if (t.equals(words[i])) {
-				return i;
-			}
-		}
-		return -1;
 	}
 }

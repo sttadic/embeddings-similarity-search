@@ -54,6 +54,16 @@ public class EmbeddingsProcessor {
 		}
 	}
 	
+	private void processResults(String[] topWords, double[] topScores) {
+		System.out.println();
+		System.out.println("--------------------------------------------------");
+		System.out.println("   Top Matching Words    |    Similarity Scores");
+		System.out.println("-------------------------|------------------------");
+		for (int i = topWords.length - 1; i >= 0; i--) {
+			System.out.printf("%3s%-22s%-5s%s%n", "", topWords[i], "|", topScores[i]);	
+		}
+	}
+	
 	// Calculate Dot Product
 	private void dotProduct(String text) throws Exception {
 		// Word not found in 'words' array
@@ -87,6 +97,7 @@ public class EmbeddingsProcessor {
 				insertIntoArray(topScores, topWords, similarityScore, words[i]);
 			}
 		}
+		processResults(topWords, topScores);
 	}
 	
 	// Insert simirlatiy scores and words into new arrays in sorted order

@@ -239,7 +239,7 @@ public class Menu {
 	 * Source: https://intellipaat.com/community/294/java-clear-the-console
 	 * Clears terminal window (doesn't work for IDE console)
 	 */
-	private void clearScreen() {
+	public static void clearScreen() {
 		out.print("\033[H\033[2J");
 		out.flush();
 	}

@@ -6,8 +6,8 @@ import java.util.Arrays;
 public class EmbeddingsProcessor {
 	private FileIO fileHandler;
 	private FileWriter out;
-	private static final int VECTOR_DIMENSION = 50;
-	private static final int MAX_WORDS = 59_602;
+	public static final int VECTOR_DIMENSION = 50;
+	public static final int MAX_WORDS = 59_602;
 	private String[] words;
 	private double[][] embeddings;
 	
@@ -26,6 +26,10 @@ public class EmbeddingsProcessor {
 		BufferedReader bReader = fileHandler.readFile(embeddingsFilePath);
 		extractWordEmbeddings(bReader);
 		bReader.close();
+		
+		// Pre-process the text and return a vector representing word or average of multiple words
+		TextProcessor tp = new TextProcessor(textToCompare, words, embeddings);
+		double[] vector = tp.processText();
 		
 		// Set the output stream file path
 		out = fileHandler.writeToFile(outputFilePath);

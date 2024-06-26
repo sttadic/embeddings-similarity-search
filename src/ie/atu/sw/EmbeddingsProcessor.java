@@ -33,11 +33,6 @@ public class EmbeddingsProcessor {
 		double[] vector = pair.vector();
 		int indexOfWord = pair.index();
 		
-		// Thorw an exception to be diplayed as an error message if word is not found in embeddings
-		if (indexOfWord == -2) {
-			throw new Exception("The word '" + textToCompare
-					+ "' could not be found in embeddings! Please try another word or check your spelling");
-		}
 		// Set the output stream file path
 		out = fileHandler.writeToFile(outputFilePath);
 		

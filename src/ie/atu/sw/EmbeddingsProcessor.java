@@ -10,7 +10,6 @@ public class EmbeddingsProcessor {
 	private static final int MAX_WORDS = 59_602;
 	private String[] words;
 	private double[][] embeddings;
-	private int numOfMatches;
 	
 	// Initialize file handler and allocate memory for words and embeddings arrays
 	public EmbeddingsProcessor() {
@@ -28,16 +27,17 @@ public class EmbeddingsProcessor {
 		extractWordEmbeddings(bReader);
 		bReader.close();
 		
-		// Set number of top matches to be stored
-		this.numOfMatches = numOfMatches;
-		out = new FileWriter(outputFilePath);
+		// Set the output stream file path
+		out = fileHandler.writeToFile(outputFilePath);
+		
 		// Invoke particular method based on measure parameter. Throw exception in case of unsupported one
 		switch (measure) {
-			case "Dot Product" 		  -> dotProduct(textToCompare);
-			case "Euclidean Distance" -> euclideanDistance(textToCompare);
-			case "Cosine Similarity"  -> cosineSimilarity(textToCompare);
+			case "Dot Product" 		  -> dotProduct(textToCompare, numOfMatches);
+			case "Euclidean Distance" -> euclideanDistance(textToCompare, numOfMatches);
+			case "Cosine Similarity"  -> cosineSimilarity(textToCompare, numOfMatches);
 			default 				  -> throw new Exception("Unsupported method: " + measure);
 		}
+		// Close output stream
 		out.close();
 		
 	}
@@ -56,8 +56,8 @@ public class EmbeddingsProcessor {
 		}
 	}
 	
-	// Print and write results to the file
-	private void printAndWrite(String s) throws IOException  {
+	// Print to console and write results to the file
+	private void printAndWrite(String s) throws IOException {
 		System.out.print(s);
 		out.write(s);
 	}
@@ -75,11 +75,12 @@ public class EmbeddingsProcessor {
 	}
 	
 	// Calculate Dot Product
-	private void dotProduct(String text) throws Exception {
+	private void dotProduct(String text, int numOfMatches) throws Exception {
 		// Word not found in 'words' array
 		int indexOfText = embVectorOfInput(text);
 		if (indexOfText == -1) {
-			throw new Exception("No matching word in embeddings. Please try another word");
+			throw new Exception("The word '" + text
+					+ "' could not be found in embeddings! Please try another word or check your spelling.");
 		}
 		
 		// Initialize arrays to store top matching scores and related words
@@ -124,12 +125,12 @@ public class EmbeddingsProcessor {
 	}
 	
 	// Calculate Euclidean Distance
-	private double euclideanDistance(String text) {
+	private double euclideanDistance(String text, int numOfMatches) {
 		return 0;
 	}
 	
 	// Calculate Cosine Similarity
-	private double cosineSimilarity(String text) {
+	private double cosineSimilarity(String text, int numOfMatches) {
 		return 0;
 	}
 	

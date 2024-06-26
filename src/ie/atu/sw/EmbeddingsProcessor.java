@@ -27,9 +27,11 @@ public class EmbeddingsProcessor {
 		extractWordEmbeddings(bReader);
 		bReader.close();
 		
-		// Pre-process the text and return a vector representing word or average of multiple words
+		// Pre-process the text and return index and a vector representing word, or average of multiple words
 		TextProcessor tp = new TextProcessor(textToCompare, words, embeddings);
-		double[] vector = tp.processText();
+		VectorIndexPair pair = tp.processText();
+		double[] vector = pair.vector();
+		int index = pair.index();
 		
 		// Set the output stream file path
 		out = fileHandler.writeToFile(outputFilePath);

@@ -11,11 +11,34 @@ public class TextProcessor {
 		this.embeddings = embeddings;
 	}
 	
-	public double[] processText() {
+	// Process text and return a record holding a vector and its index within word embeddings
+	// If text consists of multiple words, return average vector and -1 indicator as index value
+	public VectorIndexPair processText() {
+		// Initialize vector and index
 		double[] vector = new double[EmbeddingsProcessor.VECTOR_DIMENSION];
-		
+		int indexOfWord = -1;
+		// Split the text using " " (space) as delimiter
 		String[] parts = text.split(" ");
 		
+		if (parts.length <= 1) {
+			vector = processWord();
+			indexOfWord = getIndex();
+		} else {
+			vector = averageVector();
+		}
+		
+		return new VectorIndexPair(vector, indexOfWord);
+	}
+	
+	private double[] processWord() {
+		return null;
+	}
+	
+	private int getIndex() {
+		return 1;
+	}
+	
+	private double[] averageVector() {
 		return null;
 	}
 }

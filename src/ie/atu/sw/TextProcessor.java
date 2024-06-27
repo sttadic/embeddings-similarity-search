@@ -75,6 +75,28 @@ public class TextProcessor {
 	
 	// Calculates average vector if text variable contains multiple words
 	private double[] averageVector(String[] processedParts) {
-		return null;
+		double[] avgVector = new double[EmbeddingsProcessor.VECTOR_DIMENSION];
+		int partsLength = processedParts.length;
+		int[] partsIndices = new int[partsLength];
+		
+		// Get the index of each word in 'processedParts' array from 'words' array
+		// It corresponds to the index in 2D array 'embeddings'
+		for (int i = 0; i < partsLength; i++) {
+			partsIndices[i] = getIndex(processedParts[i]);
+		}
+		
+		// Iterate over avgVector length (VECTOR_DIMENSION)
+		for (int i = 0; i < avgVector.length; i++) {
+			// Initialize varibale to store sum of each embedding dimension
+			double sumOfEmbeddings = 0.0;
+			// Iterate over number of words in 'processedParts' array
+			for (int j = 0; j < partsLength; j++) {
+				// Sum the embeddings at current index for all words from 'processedParts' array
+				sumOfEmbeddings += embeddings[partsIndices[j]][i];  
+			}
+			// Calculate average embedding and store it at current index of 'avgVector' array
+			avgVector[i] = sumOfEmbeddings/partsLength;
+		}
+		return avgVector;
 	}
 }

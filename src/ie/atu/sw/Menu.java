@@ -6,11 +6,13 @@ import java.util.Scanner;
 public class Menu {
 	private Scanner scan;
 	private boolean keepRunning = true;
+	// Instance variables for program configuration with default values
 	private String embeddingsFilePath = "../word-embeddings.txt";
 	private String outputFilePath = "../output.txt";
 	private String measure = "Cosine Similarity";
 	private int numOfMatches = 10;
 	private String textToCompare;
+	// Error message displayed within the options menu
 	private String errorMsg;
 
 	public Menu() {
@@ -22,7 +24,7 @@ public class Menu {
 	public void startApplication() {
 		while (keepRunning) {
 			int choice;
-			// Input handling. Values allowed 1 to 7, otherwise set an error message and reprompt
+			// Handle invalid input (reprompt)
 			while (true) {
 				showOptions();
 				try {
@@ -44,8 +46,8 @@ public class Menu {
 				case 5  -> setMatches();
 				case 6  -> runSimilaritySearch();
 				case 7  -> keepRunning = false;
-				// Default should never be reached since input is handled within the try-catch block above
-				default -> out.println(ConsoleColour.RED + "Unexpected value: " + choice);
+				// Default should not be reached since input is handled within the try-catch block above
+				default -> errorMsg = "Unexpected value: " + choice;
 			}
 		}
 		// Application closed - display goodbye message
@@ -165,7 +167,7 @@ public class Menu {
 			errorMsg = "Text is not specified";
 			return;
 		}
-		// Create instance of 'EmbeddingsProcessor'
+		// Create an instance of 'EmbeddingsProcessor'
 		EmbeddingsProcessor processor = new EmbeddingsProcessor();
 		try {
 			// Pass in all configuration variables to start processing
@@ -222,7 +224,7 @@ public class Menu {
 		out.println(ConsoleColour.WHITE_BOLD);
 		out.println("");
 		out.println("Select Option (1-7) > ");
-		// If error, display message and reassign null to the 'errorMsg' variable to prevent it from reappearing
+		// If error, display message and reassign 'null' to prevent error from reappearing
 		if (errorMsg != null) {
 			out.println(ConsoleColour.RED + errorMsg + ConsoleColour.WHITE);
 			errorMsg = null;

@@ -98,11 +98,16 @@ public class Menu {
 		String userInput;
 		while (true) {
 			out.println(ConsoleColour.WHITE);
-			out.print("Please enter a word or a short sentence to compare against word embeddings > ");
+			out.print("Please enter a word or a short sentence to compare against word "
+					+ "embeddings (max 40 characters) > ");
 			userInput = scan.nextLine().trim().toLowerCase();
-			// Prevent empty inputs
+			// Prevent empty and large inputs
 			if (userInput.isEmpty()) {
 				out.println(ConsoleColour.RED + "Invalid input! Please try again.");
+				continue;
+			}
+			if (userInput.length() > 40) {
+				out.println(ConsoleColour.RED + "Text cannot be more than 40 character long!");
 				continue;
 			}
 			break;

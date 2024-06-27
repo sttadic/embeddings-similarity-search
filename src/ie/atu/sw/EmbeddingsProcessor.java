@@ -79,16 +79,14 @@ public class EmbeddingsProcessor {
 	
 	// Process and format results
 	private void processResults(String[] topWords, double[] topScores) throws IOException {
-		System.out.println("\n");
-		printAndWrite("--------------------------------------------------\n");
-		printAndWrite("Similarity calculated using " + ConsoleColour.GREEN + measure + ConsoleColour.WHITE
-				+ "\nInput text: " + ConsoleColour.GREEN + text + ConsoleColour.WHITE + "\n");
-		printAndWrite("--------------------------------------------------\n");
-		printAndWrite("   Top Matching Words    |    Similarity Scores\n");
-		printAndWrite("-------------------------|------------------------\n");
-		// Format with printf(). Explanation found at: https://www.baeldung.com/java-printstream-printf
+		System.out.println();
+		printAndWrite("---------------------------------------------------\n");
+		printAndWrite("Similarity calculated using " + measure + "\nInput text: " + text + "\n");
+		printAndWrite("---------------------------------------------------\n");
+		printAndWrite("    Top Matching Words    |     Similarity Scores\n");
+		printAndWrite("--------------------------|------------------------\n");
 		for (int i = topWords.length - 1; i >= 0; i--) {
-			String s = String.format("%3s%-22s%-5s%s%n", "", topWords[i], "|", topScores[i]);
+			String s = String.format("%7s%-19s%-5s%s%n", "", topWords[i], "|", topScores[i]);
 			printAndWrite(s);
 		}
 	}

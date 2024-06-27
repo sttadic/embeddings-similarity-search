@@ -21,7 +21,7 @@ public class TextProcessor {
 		// Pre-process the text to remove stop words
 		String[] processedParts = preProcessor(text);
 
-		// Process single word/multiple words accordingly
+		// Process single / multiple words accordingly
 		if (processedParts.length == 1) {
 			indexOfWord = getIndex(processedParts[0]);
 			// Throw exception to be displayed as a message to the user if word(s) not found within embeddings array
@@ -29,7 +29,7 @@ public class TextProcessor {
 				throw new Exception("The word(s) '" + text
 						+ "' could not be found in embeddings! Please try another word(s) or check your spelling");
 			}
-			// Store the word vector from 2D array 'embeddings' based on indexOfWord
+			// Store the word related vector from 2D array 'embeddings' based on indexOfWord
 			vector = embeddings[indexOfWord];
 		} else {
 			// Calculate average vector if multiple words are left after pre-processing

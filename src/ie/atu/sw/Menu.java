@@ -168,10 +168,10 @@ public class Menu {
 			return;
 		}
 		// Create an instance of 'EmbeddingsProcessor'
-		EmbeddingsProcessor processor = new EmbeddingsProcessor();
+		EmbeddingsProcessor processor = new EmbeddingsProcessor(textToCompare, measure);
 		try {
-			// Pass in all configuration variables to start processing
-			processor.start(embeddingsFilePath, outputFilePath, measure, textToCompare, numOfMatches);
+			// Pass in the rest of configuration variables to start processing
+			processor.start(embeddingsFilePath, outputFilePath, numOfMatches);
 			// Stop the application
 			out.println();
 			keepRunning = false;

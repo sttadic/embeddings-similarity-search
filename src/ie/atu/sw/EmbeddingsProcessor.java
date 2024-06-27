@@ -4,22 +4,30 @@ import java.io.*;
 import java.util.Arrays;
 
 public class EmbeddingsProcessor {
+	// Constants defining size of word embeddings arrays
 	public static final int VECTOR_DIMENSION = 50;
 	public static final int MAX_WORDS = 59_602;
-	private FileIO fileHandler;
-	private FileWriter out;
+	// Arrays to hold words and their respective embeddings
 	private String[] words;
 	private double[][] embeddings;
+	// I/O handling instance variables
+	private FileIO fileHandler;
+	private FileWriter out;
+	// Text and distance measure used for similarity search
+	private String text;
+	private String measure;
 	
-	// Initialize file handler and allocate memory for 'words' and 'embeddings' arrays
-	public EmbeddingsProcessor() {
+	// Initialize file handler, text, measure and allocate memory for 'words' and 'embeddings' arrays
+	public EmbeddingsProcessor(String text, String measure) {
 		this.fileHandler = new FileIO();
+		this.text = text;
+		this.measure = measure;
 		this.words = new String[MAX_WORDS];
 		this.embeddings = new double[MAX_WORDS][VECTOR_DIMENSION];
 	}
 	
 	// Start with processing
-	public void start(String embeddingsFilePath, String outputFilePath, String measure, String textToCompare, int numOfMatches)
+	public void start(String embeddingsFilePath, String outputFilePath, int numOfMatches)
 			throws Exception {
 		
 		// Open a BufferedReader to read the embeddings file, extract word embeddings and close the input stream
@@ -29,7 +37,7 @@ public class EmbeddingsProcessor {
 		
 		// Pre-process the text and return index and a vector representing word
 		// For multiple words (after pre-processing) vector is an average of those, and indexOfWord is set to -1
-		TextProcessor tp = new TextProcessor(textToCompare, words, embeddings);
+		TextProcessor tp = new TextProcessor(text, words, embeddings);
 		VectorIndexPair pair = tp.processText();
 		double[] vector = pair.vector();
 		int indexOfWord = pair.index();
@@ -71,7 +79,10 @@ public class EmbeddingsProcessor {
 	
 	// Process and format results
 	private void processResults(String[] topWords, double[] topScores) throws IOException {
-		System.out.println();
+		System.out.println("\n");
+		printAndWrite("--------------------------------------------------\n");
+		printAndWrite("Similarity calculated using " + ConsoleColour.GREEN + measure + ConsoleColour.WHITE
+				+ "\nInput text: " + ConsoleColour.GREEN + text + ConsoleColour.WHITE + "\n");
 		printAndWrite("--------------------------------------------------\n");
 		printAndWrite("   Top Matching Words    |    Similarity Scores\n");
 		printAndWrite("-------------------------|------------------------\n");

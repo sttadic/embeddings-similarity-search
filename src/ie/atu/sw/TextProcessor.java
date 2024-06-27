@@ -5,6 +5,7 @@ public class TextProcessor {
 	private String[] words;
 	private double[][] embeddings;
 	
+	// Initialize instance variables
 	public TextProcessor(String text, String[] words, double[][] embeddings) {
 		this.text = text;
 		this.words = words;
@@ -12,7 +13,6 @@ public class TextProcessor {
 	}
 	
 	// Process text and return a record holding a vector and its index within word embeddings
-	// If text consists of multiple words, return average vector and -1 (indexOfWord) as indicator
 	public VectorIndexPair processText() throws Exception {
 		// Initialize 'vector' array and 'index' variable
 		double[] vector = new double[EmbeddingsProcessor.VECTOR_DIMENSION];
@@ -32,10 +32,10 @@ public class TextProcessor {
 			// Store the word vector from 2D array 'embeddings' based on indexOfWord
 			vector = embeddings[indexOfWord];
 		} else {
-			// Calculate average vector
+			// Calculate average vector if multiple words are left after pre-processing
 			vector = averageVector(processedParts);
 		}
-		// Return vector and indexOfWord (value set to -1 for multiple words where average vector is calculated)
+		// Return vector and indexOfWord (indexOfWord value set to -1 when average vector is calculated - multiple words)
 		return new VectorIndexPair(vector, indexOfWord);
 	}
 	
@@ -64,7 +64,7 @@ public class TextProcessor {
 		return strNoStopWords.split(" ");
 	}
 	
-	// Returns index of a word within embeddings array, returns -2 if word not in embeddings
+	// Return index of a word within embeddings array. Return -2 if word not in embeddings
 	private int getIndex(String word) {
 		for (int i = 0; i < words.length; i++) {
 			if (word.equals(words[i])) {
@@ -74,7 +74,7 @@ public class TextProcessor {
 		return -2;
 	}
 	
-	// Calculates average vector if text variable contains multiple words
+	// Calculate average vector if 'text' variable contains multiple words
 	private double[] averageVector(String[] processedParts) {
 		double[] avgVector = new double[EmbeddingsProcessor.VECTOR_DIMENSION];
 		int partsLength = processedParts.length;

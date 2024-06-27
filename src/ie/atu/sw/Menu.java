@@ -18,7 +18,7 @@ public class Menu {
 		this.scan = new Scanner(System.in);
 	}
 	
-	// Method that starts the application
+	// Starts the application
 	public void startApplication() {
 		while (keepRunning) {
 			int choice;
@@ -51,7 +51,7 @@ public class Menu {
 				default -> out.println(ConsoleColour.RED + "Unexpected value: " + choice);
 			}
 		}
-		// Application closed. Display goodbye message
+		// Application closed - display goodbye message
 		out.println("Thank you for using Similarity Search with Word Embeddings!");
 		// Close scanner object
 		scan.close();
@@ -65,6 +65,7 @@ public class Menu {
 			out.println(ConsoleColour.WHITE);
 			out.print("Please specify the path and the name of the word embeddings file > ");
 			userInput = scan.nextLine().trim();
+			// Prevent empty inputs
 			if (userInput.isEmpty()) {
 				out.println(ConsoleColour.RED + "Invalid input! Please try again.");
 				continue;
@@ -82,6 +83,7 @@ public class Menu {
 			out.println(ConsoleColour.WHITE);
 			out.print("Please specify the path and the name of a file where results will be stored > ");
 			userInput = scan.nextLine().trim();
+			// Prevent empty inputs
 			if (userInput.isEmpty()) {
 				out.println(ConsoleColour.RED + "Invalid input! Please try again.");
 				continue;
@@ -99,6 +101,7 @@ public class Menu {
 			out.println(ConsoleColour.WHITE);
 			out.print("Please enter a word or a short sentence to compare against word embeddings > ");
 			userInput = scan.nextLine().trim().toLowerCase();
+			// Prevent empty inputs
 			if (userInput.isEmpty()) {
 				out.println(ConsoleColour.RED + "Invalid input! Please try again.");
 				continue;
@@ -145,6 +148,7 @@ public class Menu {
 	private void setMatches() {
 		clearScreen();
 		int userInput;
+		// Reprompt unless valid input is entered
 		while (true) {
 			out.println(ConsoleColour.WHITE);
 			out.print("Specify the number of top mathes to be displayed (1 - 100) > ");
@@ -169,10 +173,8 @@ public class Menu {
 			errorMsg = "Text is not specified";
 			return;
 		}
-		
 		// Create instance of 'EmbeddingsProcessor'
 		EmbeddingsProcessor processor = new EmbeddingsProcessor();
-		
 		try {
 			// Pass in all configuration variables to start processing
 			processor.start(embeddingsFilePath, outputFilePath, measure, textToCompare, numOfMatches);

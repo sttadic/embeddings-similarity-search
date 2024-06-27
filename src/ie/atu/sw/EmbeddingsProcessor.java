@@ -11,7 +11,7 @@ public class EmbeddingsProcessor {
 	private String[] words;
 	private double[][] embeddings;
 	
-	// Initialize file handler and allocate memory for words and embeddings arrays
+	// Initialize file handler and allocate memory for 'words' and 'embeddings' arrays
 	public EmbeddingsProcessor() {
 		this.fileHandler = new FileIO();
 		this.words = new String[MAX_WORDS];
@@ -27,7 +27,8 @@ public class EmbeddingsProcessor {
 		extractWordEmbeddings(bReader);
 		bReader.close();
 		
-		// Pre-process the text and return index and a vector representing word, or average of multiple words
+		// Pre-process the text and return index and a vector representing word
+		// For multiple words (after pre-processing) vector is an average of those, and indexOfWord is set to -1
 		TextProcessor tp = new TextProcessor(textToCompare, words, embeddings);
 		VectorIndexPair pair = tp.processText();
 		double[] vector = pair.vector();
@@ -74,6 +75,7 @@ public class EmbeddingsProcessor {
 		printAndWrite("--------------------------------------------------\n");
 		printAndWrite("   Top Matching Words    |    Similarity Scores\n");
 		printAndWrite("-------------------------|------------------------\n");
+		// Format with printf(). Explanation found at: https://www.baeldung.com/java-printstream-printf
 		for (int i = topWords.length - 1; i >= 0; i--) {
 			String s = String.format("%3s%-22s%-5s%s%n", "", topWords[i], "|", topScores[i]);
 			printAndWrite(s);
@@ -88,7 +90,7 @@ public class EmbeddingsProcessor {
 		// Populate 'topScores' with -infinity so it can initially be filled with 'numOfMatches' larger elements
 		Arrays.fill(topScores, Double.NEGATIVE_INFINITY);
 		
-		// Iterate over an 'embeddings' array
+		// Iterate over an 'embeddings' array of arrays
 		for (int i = 0; i < MAX_WORDS; i++) {
 			// Skip the specific vector related to user inputted word - not to be compared with itself
 			// If indexOfWord is -1, which indicates an average vector, compare with all vectors
@@ -97,7 +99,7 @@ public class EmbeddingsProcessor {
 			}
 			// Initialize similarityScore variable and reset it on each iteration
 			double similarityScore = 0;
-			// Iterate over embeddings of a particular word and calculate similarity score
+			// Iterate over embeddings dimensions and calculate similarity score
 			for (int j = 0; j < VECTOR_DIMENSION; j++) {
 				similarityScore += vector[j] * embeddings[i][j];
 			}
@@ -115,11 +117,15 @@ public class EmbeddingsProcessor {
 	private void insertIntoArray(double[] arrScores, String[] arrWords, double newScore, String newWord) {
 		
 		int i;
+		// If 'i' less than arrays length-1, and arrScores next element smaller than new similarity score
 		for (i = 0; i < arrScores.length - 1 && arrScores[i + 1] < newScore; i++) {
+			// Overwrite current element with the next one - get rid of the smallest (first) element
+			// since there is a larger one (newScore)
 			arrScores[i] = arrScores[i + 1];
 			arrWords[i] = arrWords[i + 1];
 			
 		}
+		// Store new similarity score and new word at the current index of arrays
 		arrScores[i] = newScore;
 		arrWords[i] = newWord;
 	}

@@ -4,10 +4,10 @@ import java.io.*;
 import java.util.Arrays;
 
 public class EmbeddingsProcessor {
-	private FileIO fileHandler;
-	private FileWriter out;
 	public static final int VECTOR_DIMENSION = 50;
 	public static final int MAX_WORDS = 59_602;
+	private FileIO fileHandler;
+	private FileWriter out;
 	private String[] words;
 	private double[][] embeddings;
 	
@@ -98,7 +98,7 @@ public class EmbeddingsProcessor {
 				continue;
 			}
 			// Initialize similarityScore variable and reset it on each iteration
-			double similarityScore = 0;
+			double similarityScore = 0.0;
 			// Iterate over embeddings dimensions and calculate similarity score
 			for (int j = 0; j < VECTOR_DIMENSION; j++) {
 				similarityScore += vector[j] * embeddings[i][j];
@@ -115,7 +115,6 @@ public class EmbeddingsProcessor {
 	
 	// Insert simirlatiy scores and words into new arrays in sorted order
 	private void insertIntoArray(double[] arrScores, String[] arrWords, double newScore, String newWord) {
-		
 		int i;
 		// If 'i' less than arrays length-1, and arrScores next element smaller than new similarity score
 		for (i = 0; i < arrScores.length - 1 && arrScores[i + 1] < newScore; i++) {
@@ -123,7 +122,6 @@ public class EmbeddingsProcessor {
 			// since there is a larger one (newScore)
 			arrScores[i] = arrScores[i + 1];
 			arrWords[i] = arrWords[i + 1];
-			
 		}
 		// Store new similarity score and new word at the current index of arrays
 		arrScores[i] = newScore;

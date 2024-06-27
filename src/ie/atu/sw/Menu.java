@@ -9,8 +9,8 @@ public class Menu {
 	private String embeddingsFilePath = "../word-embeddings.txt";
 	private String outputFilePath = "../output.txt";
 	private String measure = "Cosine Similarity";
-	private String textToCompare;
 	private int numOfMatches = 10;
+	private String textToCompare;
 	private String errorMsg;
 
 	public Menu() {
@@ -18,7 +18,7 @@ public class Menu {
 		this.scan = new Scanner(System.in);
 	}
 	
-	// Starts the application
+	// Start the application
 	public void startApplication() {
 		while (keepRunning) {
 			int choice;
@@ -31,17 +31,14 @@ public class Menu {
 						break;
 					}
 					errorMsg = "Invalid Selection! Please use one of the options above";
-					continue;
 				} catch (Exception e) {
-					showOptions();
 					errorMsg = "Invalid Selection! Please use one of the options above";
-					continue;
 				}
 			}
 			// Execute a statement based on user choice
 			switch (choice) {
 				case 1  -> setEmbeddingsPath();
-				case 2  -> setOutputFile();
+				case 2  -> setOutputPath();
 				case 3  -> wordOrText();
 				case 4  -> setMeasure();
 				case 5  -> setMatches();
@@ -53,7 +50,7 @@ public class Menu {
 		}
 		// Application closed - display goodbye message
 		out.println("Thank you for using Similarity Search with Word Embeddings!");
-		// Close scanner object
+		// Close instance of Scanner
 		scan.close();
 	}
 	
@@ -76,7 +73,7 @@ public class Menu {
 	}
 	
 	// Prompt for an output file path that stores results of similarity search
-	private void setOutputFile() {
+	private void setOutputPath() {
 		clearScreen();
 		String userInput;
 		while (true) {
@@ -128,12 +125,10 @@ public class Menu {
 			out.print(ConsoleColour.WHITE_BOLD + "Select Option (1-3) > ");
 			try {
 				measureChoice = Integer.parseInt(scan.nextLine());
-				if (measureChoice >= 1 && measureChoice <= 3)
-					break;
+				if (measureChoice >= 1 && measureChoice <= 3) break;
 				out.println(ConsoleColour.RED + "Invalid input! Please try again.");
 			} catch (Exception e) {
 				out.println(ConsoleColour.RED + "Invalid input! Please try again.");
-				continue;
 			}
 		}
 		// Set the measure based on user input
@@ -148,17 +143,14 @@ public class Menu {
 	private void setMatches() {
 		clearScreen();
 		int userInput;
-		// Reprompt unless valid input is entered
+		// Reprompt until value entered is between 1 and 100
 		while (true) {
 			out.println(ConsoleColour.WHITE);
 			out.print("Specify the number of top mathes to be displayed (1 - 100) > ");
 			try {
 				userInput = Integer.parseInt(scan.nextLine());
-				if (userInput >= 1 && userInput <= 100) {
-					break;
-				}
+				if (userInput >= 1 && userInput <= 100) break;
 				out.println(ConsoleColour.RED + "Invalid value. Please try again");
-				
 			} catch (Exception e) {
 				out.println(ConsoleColour.RED + "Invalid value. Please try again");
 			}
@@ -188,7 +180,7 @@ public class Menu {
 	}
 
 	// Menu options
-	public void showOptions() {
+	private void showOptions() {
 		clearScreen();
 		out.println(ConsoleColour.WHITE);
 		out.println("************************************************************");
@@ -224,9 +216,9 @@ public class Menu {
 		} else {
 			out.println("(6) START SIMILARITY SEARCH");
 		}
-		// Quit option
+		// Quit
 		out.println("(7) Quit");
-
+		// Option selection
 		out.println(ConsoleColour.WHITE_BOLD);
 		out.println("");
 		out.println("Select Option (1-7) > ");
@@ -245,5 +237,4 @@ public class Menu {
 		out.print("\033[H\033[2J");
 		out.flush();
 	}
-
 }

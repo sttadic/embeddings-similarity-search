@@ -82,7 +82,22 @@ public class EmbeddingsProcessor {
 		}
 	}
 	
-	// Calculate Dot Product
+	// Insert similarity scores and words into new arrays in sorted order
+	private void insertIntoArray(double[] arrScores, String[] arrWords, double newScore, String newWord) {
+		int i;
+		// If 'i' less than arrays length-1, and arrScores next element smaller than new similarity score
+		for (i = 0; i < arrScores.length - 1 && arrScores[i + 1] < newScore; i++) {
+			// Overwrite current element with the next one - get rid of the smallest (first) element
+			// since there is a larger one (newScore)
+			arrScores[i] = arrScores[i + 1];
+			arrWords[i] = arrWords[i + 1];
+		}
+		// Store new score and new word at the current index of arrays
+		arrScores[i] = newScore;
+		arrWords[i] = newWord;
+	}
+	
+	// Dot Product of vectors
 	private void dotProduct(double[] vector, int numOfMatches, int indexOfWord) throws Exception {
 		// Initialize arrays to store top matching scores and related words
 		String[] topWords = new String[numOfMatches];
@@ -93,47 +108,37 @@ public class EmbeddingsProcessor {
 		// Iterate over an 'embeddings' array of arrays
 		for (int i = 0; i < MAX_WORDS; i++) {
 			// Skip the specific vector related to user inputted word - not to be compared with itself
-			// If indexOfWord is -1, which indicates an average vector, compare with all vectors
+			// If indexOfWord is -1, which indicates an average vector, compare against all vectors
 			if (indexOfWord == i) {
 				continue;
 			}
-			// Initialize similarityScore variable and reset it on each iteration
-			double similarityScore = 0.0;
-			// Iterate over embeddings dimensions and calculate similarity score
-			for (int j = 0; j < VECTOR_DIMENSION; j++) {
-				similarityScore += vector[j] * embeddings[i][j];
-			}
-			
-			// If similarity score is larger than the smallest element (first element) of the 'topScores' array
-			if (similarityScore > topScores[0]) {
-				// Insert the score and a related word into a proper place in 'topScores' and 'topWords' arrays
-				insertIntoArray(topScores, topWords, similarityScore, words[i]);
+			// Calculate dot product of a vector at the current index of 'embeddings' array and input vector
+			double dotProduct = dotProductScore(i, vector);
+			// If dot product is larger than the smallest element (first element) of the 'topScores' array
+			if (dotProduct > topScores[0]) {
+				// Insert dotProduct and a related word into a proper place in 'topScores' and 'topWords' arrays
+				insertIntoArray(topScores, topWords, dotProduct, words[i]);
 			}
 		}
 		processResults(topWords, topScores);
 	}
 	
-	// Insert simirlatiy scores and words into new arrays in sorted order
-	private void insertIntoArray(double[] arrScores, String[] arrWords, double newScore, String newWord) {
-		int i;
-		// If 'i' less than arrays length-1, and arrScores next element smaller than new similarity score
-		for (i = 0; i < arrScores.length - 1 && arrScores[i + 1] < newScore; i++) {
-			// Overwrite current element with the next one - get rid of the smallest (first) element
-			// since there is a larger one (newScore)
-			arrScores[i] = arrScores[i + 1];
-			arrWords[i] = arrWords[i + 1];
+	// Compute Dot Product
+	private double dotProductScore(int index, double[] vector) {
+		double score = 0.0;
+		// Iterate over embeddings dimensions and calculate similarity score
+		for (int i = 0; i < VECTOR_DIMENSION; i++) {
+			score += vector[i] * embeddings[index][i];
 		}
-		// Store new similarity score and new word at the current index of arrays
-		arrScores[i] = newScore;
-		arrWords[i] = newWord;
+		return score;
 	}
 	
-	// Calculate Euclidean Distance
+	// Euclidean Distance of vectors
 	private double euclideanDistance(double[] vector, int numOfMatches, int indexOfWord) {
 		return 0;
 	}
 	
-	// Calculate Cosine Similarity
+	// Cosine Similarity of vectors
 	private double cosineSimilarity(double[] vector, int numOfMatches, int indexOfWord) {
 		return 0;
 	}

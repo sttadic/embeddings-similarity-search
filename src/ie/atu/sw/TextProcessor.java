@@ -14,51 +14,52 @@ public class TextProcessor {
 	// Process text and return a record holding a vector and its index within word embeddings
 	// If text consists of multiple words, return average vector and -1 (indexOfWord) as indicator
 	public VectorIndexPair processText() throws Exception {
-		// Initialize vector and index variables
+		// Initialize 'vector' array and 'index' variable
 		double[] vector = new double[EmbeddingsProcessor.VECTOR_DIMENSION];
 		int indexOfWord = -1;
 		
 		// Pre-process the text to remove stop words
-		String[] textParts = preProcessor(text);
+		String[] processedParts = preProcessor(text);
 		
 		// Process single word/multiple words accordingly
-		if (textParts.length <= 1) {
-			indexOfWord = getIndex(textParts[0]);
-			// Throw exception to be displayed as a message to the user if word not found within embeddings array
+		if (processedParts.length == 1) {
+			indexOfWord = getIndex(processedParts[0]);
+			// Throw exception to be displayed as a message to the user if word(s) not found within embeddings array
 			if (indexOfWord == -2) {
 				throw new Exception("The word(s) '" + text
 						+ "' could not be found in embeddings! Please try another word(s) or check your spelling");
 			}
-			// Store the vector of a word from embeddings 2D array based on indexOfWord
+			// Store the word vector from 2D array 'embeddings' based on indexOfWord
 			vector = embeddings[indexOfWord];
 		} else {
 			// Calculate average vector
-			vector = averageVector();
+			vector = averageVector(processedParts);
 		}
 		return new VectorIndexPair(vector, indexOfWord);
 	}
 	
 	// Remove stop words. To simplify things, all words with no matches in embeddings array are removed
 	private String[] preProcessor(String text) {
-		// Split the text using " " (space) as delimiter and store tokens in 'parts' array
+		// Split the text into words using space as a delimiter
 		String[] parts = text.split(" ");
-		// Return array if only one element in parts
+		// Return array if only one element in 'parts' array
 		if (parts.length == 1) return parts;
-		// Create an instance of StringBuilder
+		// Create an instance of StringBuilder to accumulate the matching words
 		StringBuilder sbNoStopWords = new StringBuilder();
-		// Iterate over the parts array and compare each word with elements from words array
-		for (int i = 0; i < parts.length; i++) {
-			for (int j = 0; j < words.length; j++) {
-				// If match found, append to 'sbParts' and break out of the inner loop
-				if (parts[i].equals(words[j])) {
-					sbNoStopWords.append(parts[i] + " ");
+		// Iterate over the 'parts' array and compare each word against a word from 'words' array
+		for (String part : parts) {
+			for (String word : words) {
+				// If match found, append to StringBuilder along with space, and break out of the inner loop
+				if (part.equals(word)) {
+					sbNoStopWords.append(parts).append(" ");
 					break;
 				}
 			}
 		}
-		// Convert StringBuilder back to string
-		String strNoStopWords = sbNoStopWords.toString();
-		// Return array without stop words
+		// Convert StringBuilder back to string, trim any trailing space
+		String strNoStopWords = sbNoStopWords.toString().trim();
+		// Split the accumulated string into an array of words and return it
+		// If 'strNoStopWords' is empty, splitting it will still return an array with 1 empty string element
 		return strNoStopWords.split(" ");
 	}
 	
@@ -73,7 +74,7 @@ public class TextProcessor {
 	}
 	
 	// Calculates average vector if text variable contains multiple words
-	private double[] averageVector() {
+	private double[] averageVector(String[] processedParts) {
 		return null;
 	}
 }

@@ -35,8 +35,8 @@ public class EmbeddingsProcessor {
 		extractWordEmbeddings(bReader);
 		bReader.close();
 		
-		// Pre-process the text and return index and a vector representing word
-		// For multiple words (after pre-processing) vector is an average of those, and indexOfWord is set to -1
+		// Pre-process the text and return index of a word within 'embeddings' array and its vector
+		// For multiple words (post pre-processing) average vector is calculated, and indexOfWord is set to -1
 		TextProcessor tp = new TextProcessor(text, words, embeddings);
 		VectorIndexPair pair = tp.processText();
 		double[] vector = pair.vector();
@@ -45,7 +45,7 @@ public class EmbeddingsProcessor {
 		// Set the output stream file path
 		out = fileHandler.writeToFile(outputFilePath);
 		
-		// Invoke particular method based on measure parameter. Throw exception in case of unsupported one
+		// Invoke particular method based on 'measure' variable. Throw exception in case of unsupported one
 		switch (measure) {
 			case "Dot Product" 		  -> dotProduct(vector, numOfMatches, indexOfWord);
 			case "Euclidean Distance" -> euclideanDistance(vector, numOfMatches, indexOfWord);

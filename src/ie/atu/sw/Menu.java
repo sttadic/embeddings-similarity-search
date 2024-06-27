@@ -107,7 +107,7 @@ public class Menu {
 				continue;
 			}
 			if (userInput.length() > 40) {
-				out.println(ConsoleColour.RED + "Text cannot be more than 40 character long!");
+				out.println(ConsoleColour.RED + "Text cannot be more than 40 characters long!");
 				continue;
 			}
 			break;
@@ -138,7 +138,7 @@ public class Menu {
 				out.println(ConsoleColour.RED + "Invalid input! Please try again.");
 			}
 		}
-		// Set the measure based on user input
+		// Set the distance measure based on user input
 		switch (measureChoice) {
 			case 1  -> measure = "Dot Product";
 			case 2  -> measure = "Euclidean Distance";
@@ -177,7 +177,7 @@ public class Menu {
 		try {
 			// Pass in the rest of configuration variables to start processing
 			processor.start(embeddingsFilePath, outputFilePath, numOfMatches);
-			// Stop the application
+			// After similarity search finishes, close the application
 			out.println();
 			keepRunning = false;
 		// Assign content of the exception to the 'errorMsg' variable displayed within the options menu

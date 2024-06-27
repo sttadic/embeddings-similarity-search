@@ -20,7 +20,7 @@ public class TextProcessor {
 		
 		// Pre-process the text to remove stop words
 		String[] processedParts = preProcessor(text);
-		
+
 		// Process single word/multiple words accordingly
 		if (processedParts.length == 1) {
 			indexOfWord = getIndex(processedParts[0]);
@@ -52,7 +52,7 @@ public class TextProcessor {
 			for (String word : words) {
 				// If match found, append to StringBuilder along with space, and break out of the inner loop
 				if (part.equals(word)) {
-					sbNoStopWords.append(parts).append(" ");
+					sbNoStopWords.append(part).append(" ");
 					break;
 				}
 			}

@@ -35,6 +35,7 @@ public class TextProcessor {
 			// Calculate average vector
 			vector = averageVector(processedParts);
 		}
+		// Return vector and indexOfWord (value set to -1 for multiple words where average vector is calculated)
 		return new VectorIndexPair(vector, indexOfWord);
 	}
 	

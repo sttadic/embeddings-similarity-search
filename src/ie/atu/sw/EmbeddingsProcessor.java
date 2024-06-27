@@ -38,9 +38,9 @@ public class EmbeddingsProcessor {
 		
 		// Invoke particular method based on measure parameter. Throw exception in case of unsupported one
 		switch (measure) {
-			case "Dot Product" 		  -> dotProduct(textToCompare, numOfMatches, indexOfWord);
-			case "Euclidean Distance" -> euclideanDistance(textToCompare, numOfMatches, indexOfWord);
-			case "Cosine Similarity"  -> cosineSimilarity(textToCompare, numOfMatches, indexOfWord);
+			case "Dot Product" 		  -> dotProduct(vector, numOfMatches, indexOfWord);
+			case "Euclidean Distance" -> euclideanDistance(vector, numOfMatches, indexOfWord);
+			case "Cosine Similarity"  -> cosineSimilarity(vector, numOfMatches, indexOfWord);
 			default 				  -> throw new Exception("Unsupported method: " + measure);
 		}
 		// Close output stream
@@ -81,7 +81,7 @@ public class EmbeddingsProcessor {
 	}
 	
 	// Calculate Dot Product
-	private void dotProduct(String text, int numOfMatches, int indexOfWord) throws Exception {
+	private void dotProduct(double[] vector, int numOfMatches, int indexOfWord) throws Exception {
 		// Initialize arrays to store top matching scores and related words
 		String[] topWords = new String[numOfMatches];
 		double[] topScores = new double[numOfMatches];
@@ -90,15 +90,16 @@ public class EmbeddingsProcessor {
 		
 		// Iterate over an 'embeddings' array
 		for (int i = 0; i < MAX_WORDS; i++) {
-			// Skip the vector related to user inputted word - not to be compared with itself
-			if (indexOfWord== i) {
+			// Skip the specific vector related to user inputted word - not to be compared with itself
+			// If indexOfWord is -1, which indicates an average vector, compare with all vectors
+			if (indexOfWord == i) {
 				continue;
 			}
 			// Initialize similarityScore variable and reset it on each iteration
 			double similarityScore = 0;
 			// Iterate over embeddings of a particular word and calculate similarity score
 			for (int j = 0; j < VECTOR_DIMENSION; j++) {
-				similarityScore += embeddings[indexOfWord][j] * embeddings[i][j];
+				similarityScore += vector[j] * embeddings[i][j];
 			}
 			
 			// If similarity score is larger than the smallest element (first element) of the 'topScores' array
@@ -124,12 +125,12 @@ public class EmbeddingsProcessor {
 	}
 	
 	// Calculate Euclidean Distance
-	private double euclideanDistance(String text, int numOfMatches, int indexOfWord) {
+	private double euclideanDistance(double[] vector, int numOfMatches, int indexOfWord) {
 		return 0;
 	}
 	
 	// Calculate Cosine Similarity
-	private double cosineSimilarity(String text, int numOfMatches, int indexOfWord) {
+	private double cosineSimilarity(double[] vector, int numOfMatches, int indexOfWord) {
 		return 0;
 	}
 }

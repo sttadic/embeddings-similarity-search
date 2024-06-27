@@ -6,8 +6,8 @@ import java.util.Scanner;
 public class Menu {
 	private Scanner scan;
 	private boolean keepRunning = true;
-	private String embeddingsFilePath = "./word-embeddings.txt";
-	private String outputFilePath = "./output.txt";
+	private String embeddingsFilePath = "../word-embeddings.txt";
+	private String outputFilePath = "../output.txt";
 	private String measure = "Cosine Similarity";
 	private String textToCompare;
 	private int numOfMatches = 10;

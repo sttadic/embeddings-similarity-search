@@ -104,7 +104,7 @@ public class EmbeddingsProcessor {
 	private double[] populateArr(int numOfMatches) throws Exception {
 		double[] scoresArr = new double[numOfMatches];
 		/* Depending whether smaller (euclidean) or larger values represent greater similarity,
-		fill the arrays with pos/neg infinity, so initial 'n' number of computed scores can be
+		fill the arrays with pos/neg infinity, so initial numOfMatches (scores) can be
 		compared against infinities (larger or smaller values) and stored into arrays */
 		if (measure.equals("Euclidean Distance")) {
 			Arrays.fill(scoresArr, Double.POSITIVE_INFINITY);
@@ -130,7 +130,7 @@ public class EmbeddingsProcessor {
 			}
 			// Initialize 'simScore' variable that stores result of comparison between two vectors
 			double simScore = 0.0;
-			// Calculate similarity score of a vector at the current index of 'embeddings' and input vector
+			// Calculate similarity between vector at the current index of 'embeddings' and input vector
 			switch (measure) {
 				case "Dot Product" 		  -> {
 					simScore = dotProduct(i, vector); 
@@ -153,30 +153,38 @@ public class EmbeddingsProcessor {
 	
 	// Dot Product of vectors
 	private double dotProduct(int index, double[] vector) {
-		double score = 0.0;
-		// Iterate over embeddings dimension and calculate similarity score
+		double dotProd = 0.0;
+		// Iterate over embeddings dimension and multiply elements of vectors
 		for (int i = 0; i < VECTOR_DIMENSION; i++) {
-			score += vector[i] * embeddings[index][i];
+			dotProd += vector[i] * embeddings[index][i];
 		}
-		return score;
+		// Return dot product
+		return dotProd;
 	}
 	
 	// Euclidean Distance of vectors
 	private double euclideanDistance(int index, double[] vector) {
-		return 0;
+		double sum = 0.0;
+		// Calculate sum of squared differences between vectors
+		for (int i = 0; i < VECTOR_DIMENSION; i++) {
+			sum += Math.pow(vector[i] - embeddings[index][i], 2);
+		}
+		// Return euclidean distance (square root of sum)
+		return Math.sqrt(sum);
 	}
 	
 	// Cosine Similarity of vectors
 	private double cosineSimilarity(int index, double[] vector) {
-		double sumOfSqrInputVec = 0.0;
-		double sumOfSqrEmbedVec = 0.0;
-		// Calculate sum of squares of each vector's elements
+		double sumInputVec = 0.0;
+		double sumEmbedVec = 0.0;
+		// Calculate sum of squares of vector elements
 		for (int i = 0; i < VECTOR_DIMENSION; i++) {
-			sumOfSqrInputVec += Math.pow(vector[i], 2);
-			sumOfSqrEmbedVec += Math.pow(embeddings[index][i], 2);
+			sumInputVec += Math.pow(vector[i], 2);
+			sumEmbedVec += Math.pow(embeddings[index][i], 2);
 		}
 		// Square root of product of vectors
-		double prodOfMagnitudes = Math.sqrt(sumOfSqrInputVec * sumOfSqrEmbedVec);
-		return dotProduct(index, vector) / prodOfMagnitudes;
+		double sqRootOfProd = Math.sqrt(sumInputVec * sumEmbedVec);
+		// Return cosine similarity (quotient of dot product and 'sqRootOfProd') 
+		return dotProduct(index, vector) / sqRootOfProd;
 	}
 }

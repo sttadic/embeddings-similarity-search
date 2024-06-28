@@ -30,31 +30,26 @@ public class EmbeddingsProcessor {
 	public void start(String embeddingsFilePath, String outputFilePath, int numOfMatches)
 			throws Exception {
 		
-		// Open a BufferedReader to read the embeddings file, extract word embeddings and close the input stream
+		// Open BufferedReader to read the embeddings file, extract word embeddings and close the input stream
 		BufferedReader bReader = fileHandler.readFile(embeddingsFilePath);
 		extractWordEmbeddings(bReader);
 		bReader.close();
 		
 		// Pre-process the text and return index of a word within 'embeddings' array and its vector
-		// For multiple words (post pre-processing) average vector is calculated, and indexOfWord is set to -1
+		// For multiple words (post pre-processing) average vector is calculated, and indexOfWord is -1
 		TextProcessor tp = new TextProcessor(text, words, embeddings);
 		VectorIndexPair pair = tp.processText();
 		double[] vector = pair.vector();
 		int indexOfWord = pair.index();
 		
-		// Set the output stream file path
+		// Set up the output stream
 		out = fileHandler.writeToFile(outputFilePath);
 		
-		// Invoke particular method based on 'measure' variable. Throw exception in case of unsupported one
-		switch (measure) {
-			case "Dot Product" 		  -> dotProduct(vector, numOfMatches, indexOfWord);
-			case "Euclidean Distance" -> euclideanDistance(vector, numOfMatches, indexOfWord);
-			case "Cosine Similarity"  -> cosineSimilarity(vector, numOfMatches, indexOfWord);
-			default 				  -> throw new Exception("Unsupported method: " + measure);
-		}
+		// Start vector comparison and compute similarity scores
+		computeSimScores(vector, numOfMatches, indexOfWord);
+		
 		// Close output stream
 		out.close();
-		
 	}
 	
 	// Extract elements from each line of input stream and store them into relevant arrays
@@ -79,14 +74,13 @@ public class EmbeddingsProcessor {
 	
 	// Process and format results
 	private void processResults(String[] topWords, double[] topScores) throws IOException {
-		System.out.println();
-		printAndWrite("---------------------------------------------------\n");
-		printAndWrite("Similarity calculated using " + measure + "\nInput text: " + text + "\n");
-		printAndWrite("---------------------------------------------------\n");
-		printAndWrite("    Top Matching Words    |     Similarity Scores\n");
-		printAndWrite("--------------------------|------------------------\n");
+		System.out.println("\n");
+		printAndWrite(" Similarity calculated using " + measure + "\n Input text: " + text + "\n");
+		printAndWrite(" ------------------------------------------\n");
+		printAndWrite("  Top Matching Words |  Similarity Scores\n");
+		printAndWrite(" ====================|=====================\n");
 		for (int i = topWords.length - 1; i >= 0; i--) {
-			String s = String.format("%7s%-19s%-5s%s%n", "", topWords[i], "|", topScores[i]);
+			String s = String.format("%2s%-19s%-3s%s%n", "", topWords[i], "|", topScores[i]);
 			printAndWrite(s);
 		}
 	}
@@ -106,36 +100,61 @@ public class EmbeddingsProcessor {
 		arrWords[i] = newWord;
 	}
 	
-	// Dot Product of vectors
-	private void dotProduct(double[] vector, int numOfMatches, int indexOfWord) throws Exception {
+	// Pre-populate array for scores with positove/negative infinity depending on metric used
+	private double[] populateArr(int numOfMatches) throws Exception {
+		double[] scoresArr = new double[numOfMatches];
+		/* Depending whether smaller (euclidean) or larger values represent greater similarity,
+		fill the arrays with pos/neg infinity, so initial 'n' number of computed scores can be
+		compared against infinities (larger or smaller values) and stored into arrays */
+		if (measure.equals("Euclidean Distance")) {
+			Arrays.fill(scoresArr, Double.POSITIVE_INFINITY);
+		} else if (measure.equals("Dot Product") || measure.equals("Cosine Similarity")) {
+			Arrays.fill(scoresArr, Double.NEGATIVE_INFINITY);
+		} else {
+			throw new Exception("Unsupported method: " + measure);
+		}
+		return scoresArr;
+	}
+	
+	// Compare vectors and calculate scores
+	private void computeSimScores(double[] vector, int numOfMatches, int indexOfWord) throws Exception {
 		// Initialize arrays to store top matching scores and related words
 		String[] topWords = new String[numOfMatches];
-		double[] topScores = new double[numOfMatches];
-		// Populate 'topScores' with -infinity so it can initially be filled with 'numOfMatches' larger elements
-		Arrays.fill(topScores, Double.NEGATIVE_INFINITY);
+		double[] topScores = populateArr(numOfMatches);
 		
-		// Iterate over an 'embeddings' array of arrays
+		// Iterate over an 'embeddings' 2D array
 		for (int i = 0; i < MAX_WORDS; i++) {
 			// Skip the specific vector related to user inputted word - not to be compared with itself
-			// If indexOfWord is -1, which indicates an average vector, compare against all vectors
 			if (indexOfWord == i) {
 				continue;
 			}
-			// Calculate dot product of a vector at the current index of 'embeddings' array and input vector
-			double dotProduct = dotProductScore(i, vector);
-			// If dot product is larger than the smallest element (first element) of the 'topScores' array
-			if (dotProduct > topScores[0]) {
-				// Insert dotProduct and a related word into a proper place in 'topScores' and 'topWords' arrays
-				insertIntoArray(topScores, topWords, dotProduct, words[i]);
+			// Initialize 'simScore' variable that stores result of comparison between two vectors
+			double simScore = 0.0;
+			// Calculate similarity score of a vector at the current index of 'embeddings' and input vector
+			switch (measure) {
+				case "Dot Product" 		  -> {
+					simScore = dotProduct(i, vector); 
+					}
+				case "Euclidean Distance" -> { 
+					simScore = euclideanDistance(i, vector);
+				}
+				case "Cosine Similarity"  -> {
+					simScore = cosineSimilarity(i, vector);
+				}
+			}
+			// If simScore is larger than the smallest element (first element) of the 'topScores' array
+			if (simScore > topScores[0]) {
+				// Insert simScore and a related word into a proper place in 'topScores' and 'topWords' arrays
+				insertIntoArray(topScores, topWords, simScore, words[i]);
 			}
 		}
 		processResults(topWords, topScores);
 	}
 	
-	// Compute Dot Product
-	private double dotProductScore(int index, double[] vector) {
+	// Dot Product of vectors
+	private double dotProduct(int index, double[] vector) {
 		double score = 0.0;
-		// Iterate over embeddings dimensions and calculate similarity score
+		// Iterate over embeddings dimension and calculate similarity score
 		for (int i = 0; i < VECTOR_DIMENSION; i++) {
 			score += vector[i] * embeddings[index][i];
 		}
@@ -143,12 +162,12 @@ public class EmbeddingsProcessor {
 	}
 	
 	// Euclidean Distance of vectors
-	private double euclideanDistance(double[] vector, int numOfMatches, int indexOfWord) {
+	private double euclideanDistance(int index, double[] vector) {
 		return 0;
 	}
 	
 	// Cosine Similarity of vectors
-	private double cosineSimilarity(double[] vector, int numOfMatches, int indexOfWord) {
+	private double cosineSimilarity(int index, double[] vector) {
 		return 0;
 	}
 }

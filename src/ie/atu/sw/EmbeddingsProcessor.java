@@ -85,33 +85,29 @@ public class EmbeddingsProcessor {
 		}
 	}
 	
-	// Insert similarity scores and words into new arrays in sorted order
-	private void insertIntoArray(double[] arrScores, String[] arrWords, double newScore, String newWord) {
+	// Insert similarity scores and words into arrays in sorted order
+	private void insertIntoArray(double[] topScores, String[] topWords, double newScore, String newWord) {
 		int i;
-		// If 'i' less than arrays length-1, and arrScores next element smaller than new similarity score
-		for (i = 0; i < arrScores.length - 1 && arrScores[i + 1] < newScore; i++) {
+		// If 'i' less than arrays length-1, and 'topScores' next element smaller than new similarity score
+		for (i = 0; i < topScores.length - 1 && topScores[i + 1] < newScore; i++) {
 			// Overwrite current element with the next one - get rid of the smallest (first) element
 			// since there is a larger one (newScore)
-			arrScores[i] = arrScores[i + 1];
-			arrWords[i] = arrWords[i + 1];
+			topScores[i] = topScores[i + 1];
+			topWords[i] = topWords[i + 1];
 		}
 		// Store new score and new word at the current index of arrays
-		arrScores[i] = newScore;
-		arrWords[i] = newWord;
+		topScores[i] = newScore;
+		topWords[i] = newWord;
 	}
 	
-	// Pre-populate array for scores with positove/negative infinity depending on metric used
-	private double[] populateArr(int numOfMatches) throws Exception {
+	// Fill scores array with infinities so first 'n' number of simScores can be added
+	private double[] populateArr(int numOfMatches) {
 		double[] scoresArr = new double[numOfMatches];
-		/* Depending whether smaller (euclidean) or larger values represent greater similarity,
-		fill the arrays with pos/neg infinity, so initial numOfMatches (scores) can be
-		compared against infinities (larger or smaller values) and stored into arrays */
+		// For euclidean distance use +inifinity since smaller values indicate greater similarity
 		if (measure.equals("Euclidean Distance")) {
 			Arrays.fill(scoresArr, Double.POSITIVE_INFINITY);
-		} else if (measure.equals("Dot Product") || measure.equals("Cosine Similarity")) {
-			Arrays.fill(scoresArr, Double.NEGATIVE_INFINITY);
 		} else {
-			throw new Exception("Unsupported method: " + measure);
+			Arrays.fill(scoresArr, Double.NEGATIVE_INFINITY);
 		}
 		return scoresArr;
 	}
@@ -124,7 +120,7 @@ public class EmbeddingsProcessor {
 		
 		// Iterate over an 'embeddings' 2D array
 		for (int i = 0; i < MAX_WORDS; i++) {
-			// Skip the specific vector related to user inputted word - not to be compared with itself
+			// Skip index of a vector representing word from user input - not to be compared with itself
 			if (indexOfWord == i) {
 				continue;
 			}
@@ -140,6 +136,9 @@ public class EmbeddingsProcessor {
 				}
 				case "Cosine Similarity"  -> {
 					simScore = cosineSimilarity(i, vector);
+				}
+				default					  -> {
+					throw new Exception("Unsupported method: " + measure);
 				}
 			}
 			// If simScore is larger than the smallest element (first element) of the 'topScores' array

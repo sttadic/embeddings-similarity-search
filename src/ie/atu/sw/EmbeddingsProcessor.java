@@ -79,21 +79,35 @@ public class EmbeddingsProcessor {
 		printAndWrite(" ------------------------------------------\n");
 		printAndWrite("  Top Matching Words |  Similarity Scores\n");
 		printAndWrite(" ====================|=====================\n");
-		for (int i = topWords.length - 1; i >= 0; i--) {
-			String s = String.format("%2s%-19s%-3s%s%n", "", topWords[i], "|", topScores[i]);
-			printAndWrite(s);
+		for (int i = 0; i < topWords.length; i++) {
+			String row = String.format("%2s%-19s%-3s%s%n", "", topWords[i], "|", topScores[i]);
+			printAndWrite(row);
 		}
 	}
 	
 	// Insert similarity scores and words into arrays in sorted order
-	private void insertIntoArray(double[] topScores, String[] topWords, double newScore, String newWord) {
-		int i;
-		// If 'i' less than arrays length-1, and 'topScores' next element smaller than new similarity score
-		for (i = 0; i < topScores.length - 1 && topScores[i + 1] < newScore; i++) {
-			// Overwrite current element with the next one - get rid of the smallest (first) element
-			// since there is a larger one (newScore)
-			topScores[i] = topScores[i + 1];
-			topWords[i] = topWords[i + 1];
+	private void insertIntoArr(double[] topScores, String[] topWords, double newScore, String newWord) {
+		int i = 0;
+		// Euclidean distance (smaller values indicate greater similarity between vectors)
+		if (measure.equals("Euclidean Distance")) {
+			// Return unless newScore is smaller than the largest (last) element of the 'topScores' array
+			if (newScore > topScores[topScores.length-1]) return;
+			// If 'i' larger than zero, and 'topScores' previous element larger than new score
+			for (i = topScores.length - 1; i > 0 && topScores[i - 1] > newScore; i--) {
+				// Overwrite current element with the previous one - drop largest (last) element
+				topScores[i] = topScores[i - 1];
+				topWords[i] = topWords[i - 1];
+			} 
+		// Cosine Similarity and Dot Product (larger values indicate greater similarity between vectors)
+		} else {
+			// Return unless newScore is larger than the smallest (last) element of the 'topScores' array
+			if (newScore < topScores[topScores.length-1]) return; 
+			// If 'i' larger than 0, and 'topScores' previous element smaller than new score
+			for (i = topScores.length - 1; i > 0 && topScores[i - 1] < newScore; i--) {
+				// Overwrite current element with the previous one - drop smallest (last) element
+				topScores[i] = topScores[i - 1];
+				topWords[i] = topWords[i - 1];
+			}
 		}
 		// Store new score and new word at the current index of arrays
 		topScores[i] = newScore;
@@ -141,11 +155,8 @@ public class EmbeddingsProcessor {
 					throw new Exception("Unsupported method: " + measure);
 				}
 			}
-			// If simScore is larger than the smallest element (first element) of the 'topScores' array
-			if (simScore > topScores[0]) {
-				// Insert simScore and a related word into a proper place in 'topScores' and 'topWords' arrays
-				insertIntoArray(topScores, topWords, simScore, words[i]);
-			}
+			// Insert simScore and a related word into a proper place in 'topScores' and 'topWords' arrays
+			insertIntoArr(topScores, topWords, simScore, words[i]);
 		}
 		processResults(topWords, topScores);
 	}

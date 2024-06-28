@@ -168,6 +168,15 @@ public class EmbeddingsProcessor {
 	
 	// Cosine Similarity of vectors
 	private double cosineSimilarity(int index, double[] vector) {
-		return 0;
+		double sumOfSqrInputVec = 0.0;
+		double sumOfSqrEmbedVec = 0.0;
+		// Calculate sum of squares of each vector's elements
+		for (int i = 0; i < VECTOR_DIMENSION; i++) {
+			sumOfSqrInputVec += Math.pow(vector[i], 2);
+			sumOfSqrEmbedVec += Math.pow(embeddings[index][i], 2);
+		}
+		// Square root of product of vectors
+		double prodOfMagnitudes = Math.sqrt(sumOfSqrInputVec * sumOfSqrEmbedVec);
+		return dotProduct(index, vector) / prodOfMagnitudes;
 	}
 }

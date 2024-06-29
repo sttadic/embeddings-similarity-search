@@ -31,14 +31,14 @@ public class EmbeddingsProcessor {
 	public void start(String embeddingsFilePath, String outputFilePath, int numOfMatches)
 			throws Exception {
 		
-		// Read the embeddings file with BufferedReader, extract embeddings and close the input stream
+		// Read the embeddings file using BufferedReader, extract embeddings and close input stream
 		BufferedReader bReader = fileHandler.readFile(embeddingsFilePath);
 		extractWordEmbeddings(bReader);
 		bReader.close();
 		
-		// Pre-process the text. Create instances of TextProcessor
+		// Create instance of TextProcessor and process the input text
 		TextProcessor textProc = new TextProcessor(text, words, embeddings);
-		// Instantiate record that holds vector, index of a word from 'words' array and processed text
+		// Instantiate record that holds vector, index of a word from 'words' array, and processed text
 		ProcessedText processedText = textProc.processText();
 		double[] vector = processedText.vector();
 		int indexOfWord = processedText.index();
@@ -58,6 +58,7 @@ public class EmbeddingsProcessor {
 	private void extractWordEmbeddings(BufferedReader br) throws Exception {
 		// First line of of input stream is empty
 		if (br.readLine() == null) {
+			br.close();
 			throw new Exception("Word embeddings file is empty!");
 		}
 		int i = 0;
@@ -74,6 +75,7 @@ public class EmbeddingsProcessor {
 				}
 				i++;
 			} catch (Exception e) {
+				br.close();
 				throw new Exception("Error reading word embeddings file!");
 			}
 		}

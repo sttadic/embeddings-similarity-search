@@ -16,6 +16,7 @@ public class EmbeddingsProcessor {
 	// Text and distance measure used for similarity search
 	private String text;
 	private String measure;
+	private String postProcText;
 	
 	// Initialize file handler, text, measure and allocate memory for 'words' and 'embeddings' arrays
 	public EmbeddingsProcessor(String text, String measure) {
@@ -35,12 +36,15 @@ public class EmbeddingsProcessor {
 		extractWordEmbeddings(bReader);
 		bReader.close();
 		
-		// Pre-process the text and return index of a word within 'embeddings' array and its vector
-		// For multiple words (post pre-processing) average vector is calculated, and indexOfWord is -1
+		// Pre-process the text. Create instances of TextProcessor and ProcessedText
 		TextProcessor tp = new TextProcessor(text, words, embeddings);
-		VectorIndexPair pair = tp.processText();
-		double[] vector = pair.vector();
-		int indexOfWord = pair.index();
+		ProcessedText pt = tp.processText();
+		// Vector of a single word or average vector of multiple words
+		double[] vector = pt.vector();
+		// Index of a word within 'words' ('embeddings') array, or -1 if average vector is calculated
+		int indexOfWord = pt.index();
+		// Assign what is left of original text after processing to 'postProcText' variable
+		postProcText = pt.postProcText();
 		
 		// Set up the output stream
 		out = fileHandler.writeToFile(outputFilePath);
@@ -72,20 +76,25 @@ public class EmbeddingsProcessor {
 		out.write(s);
 	}
 	
-	// Process and format results
+	/* 
+	 * Process and format results
+	 * Format strings explanation found at: https://www.developer.com/java/java-string-format-method/
+	 */
 	private void processResults(String[] topWords, double[] topScores) throws IOException {
 		System.out.println("\n");
-		printAndWrite(" Similarity calculated using " + measure + "\n Input text: " + text + "\n");
-		printAndWrite(" ------------------------------------------\n");
-		printAndWrite("  Top Matching Words |  Similarity Scores\n");
-		printAndWrite(" ====================|=====================\n");
+		printAndWrite("* Scores represent " + measure + " between vectors\n");
+		printAndWrite("* Input text: - " + text + " -\n");
+		printAndWrite("* Words used: - " + postProcText + " -\n");
+		printAndWrite("  ==========================================\n");
+		printAndWrite("   Top Matching Words |  Similarity Scores\n");
+		printAndWrite("  ====================|=====================\n");
 		for (int i = 0; i < topWords.length; i++) {
-			String row = String.format("%2s%-19s%-3s%s%n", "", topWords[i], "|", topScores[i]);
+			String row = String.format("%3s%-19s%-3s%s%n", "", topWords[i], "|", topScores[i]);
 			printAndWrite(row);
 		}
 	}
 	
-	// Insert similarity scores and words into arrays in sorted order
+	// Insert similarity scores and corresponding words into arrays in sorted order
 	private void insertIntoArr(double[] topScores, String[] topWords, double newScore, String newWord) {
 		int i = 0;
 		// Euclidean distance (smaller values indicate greater similarity between vectors)
@@ -114,16 +123,16 @@ public class EmbeddingsProcessor {
 		topWords[i] = newWord;
 	}
 	
-	// Fill scores array with infinities so first 'n' number of simScores can be added
+	// Fill array with infinities so first 'n' number of calculated scores can be added
 	private double[] populateArr(int numOfMatches) {
-		double[] scoresArr = new double[numOfMatches];
+		double[] arr = new double[numOfMatches];
 		// For euclidean distance use +inifinity since smaller values indicate greater similarity
 		if (measure.equals("Euclidean Distance")) {
-			Arrays.fill(scoresArr, Double.POSITIVE_INFINITY);
+			Arrays.fill(arr, Double.POSITIVE_INFINITY);
 		} else {
-			Arrays.fill(scoresArr, Double.NEGATIVE_INFINITY);
+			Arrays.fill(arr, Double.NEGATIVE_INFINITY);
 		}
-		return scoresArr;
+		return arr;
 	}
 	
 	// Compare vectors and calculate scores

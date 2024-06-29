@@ -6,10 +6,10 @@ import java.util.Scanner;
 public class Menu {
 	private Scanner scan;
 	private boolean keepRunning = true;
-	// Instance variables for program configuration with default values
+	// App configuration instance variables with default values
 	private String embeddingsFilePath = "../word-embeddings.txt";
 	private String outputFilePath = "../output.txt";
-	private String measure = "Cosine Similarity";
+	private String metric = "Cosine Similarity";
 	private int numOfMatches = 10;
 	private String textToCompare;
 	// Error message displayed within the options menu
@@ -24,7 +24,7 @@ public class Menu {
 	public void startApplication() {
 		while (keepRunning) {
 			int choice;
-			// Handle invalid input (reprompt)
+			// Display an error message and reprompt for invalid input
 			while (true) {
 				showOptions();
 				try {
@@ -42,7 +42,7 @@ public class Menu {
 				case 1  -> setEmbeddingsPath();
 				case 2  -> setOutputPath();
 				case 3  -> wordOrText();
-				case 4  -> setMeasure();
+				case 4  -> setMetric();
 				case 5  -> setMatches();
 				case 6  -> runSimilaritySearch();
 				case 7  -> keepRunning = false;
@@ -64,7 +64,7 @@ public class Menu {
 			out.println(ConsoleColour.WHITE);
 			out.print("Please specify the path and the name of the word embeddings file > ");
 			userInput = scan.nextLine().trim();
-			// Prevent empty inputs
+			// Prevent empty input string
 			if (userInput.isEmpty()) {
 				out.println(ConsoleColour.RED + "Invalid input! Please try again.");
 				continue;
@@ -82,7 +82,7 @@ public class Menu {
 			out.println(ConsoleColour.WHITE);
 			out.print("Please specify the path and the name of a file where results will be stored > ");
 			userInput = scan.nextLine().trim();
-			// Prevent empty inputs
+			// Prevent empty input string
 			if (userInput.isEmpty()) {
 				out.println(ConsoleColour.RED + "Invalid input! Please try again.");
 				continue;
@@ -101,7 +101,7 @@ public class Menu {
 			out.print("Please enter a word or a short sentence to compare against word "
 					+ "embeddings (max 50 characters) > ");
 			userInput = scan.nextLine().trim().toLowerCase();
-			// Prevent empty and large inputs
+			// Reprompt for empty of large string
 			if (userInput.isEmpty()) {
 				out.println(ConsoleColour.RED + "Invalid input! Please try again.");
 				continue;
@@ -115,34 +115,34 @@ public class Menu {
 		textToCompare = userInput;
 	}
 	
-	// Method that defines measure to be used for similarity search
-	private void setMeasure() {
+	// Method that defines metric to be used for similarity search
+	private void setMetric() {
 		clearScreen();
 		out.println(ConsoleColour.WHITE_BOLD);
-		out.println("Select a method you would like to use to find the closest matches to your input");
+		out.println("Select a metric you would like to use to find the closest matches to your input");
 		out.print("*******************************************************************************");
 		out.println(ConsoleColour.WHITE);
 		out.println("(1) Dot Product");
 		out.println("(2) Euclidean Distance");
 		out.println("(3) Cosine Similarity");
 		out.println();
-		// Initialize measureChoice variable and handle user input
-		int measureChoice = 0;
+		// Initialize metricChoice variable and handle user input
+		int metricChoice = 0;
 		while (true) {
 			out.print(ConsoleColour.WHITE_BOLD + "Select Option (1-3) > ");
 			try {
-				measureChoice = Integer.parseInt(scan.nextLine());
-				if (measureChoice >= 1 && measureChoice <= 3) break;
+				metricChoice = Integer.parseInt(scan.nextLine());
+				if (metricChoice >= 1 && metricChoice <= 3) break;
 				out.println(ConsoleColour.RED + "Invalid input! Please try again.");
 			} catch (Exception e) {
 				out.println(ConsoleColour.RED + "Invalid input! Please try again.");
 			}
 		}
-		// Set the distance measure based on user input
-		switch (measureChoice) {
-			case 1  -> measure = "Dot Product";
-			case 2  -> measure = "Euclidean Distance";
-			default -> measure = "Cosine Similarity";
+		// Set the distance metric based on user input (default to Cosine Similarity)
+		switch (metricChoice) {
+			case 1  -> metric = "Dot Product";
+			case 2  -> metric = "Euclidean Distance";
+			default -> metric = "Cosine Similarity";
 		}
 	}
 	
@@ -150,13 +150,13 @@ public class Menu {
 	private void setMatches() {
 		clearScreen();
 		int userInput;
-		// Reprompt until value entered is between 1 and 100
+		// Handle user input - reprompt until value between 1 and 99
 		while (true) {
 			out.println(ConsoleColour.WHITE);
-			out.print("Specify the number of top mathes to be displayed (1 - 100) > ");
+			out.print("Specify the number of top matches to be displayed (1 - 99) > ");
 			try {
 				userInput = Integer.parseInt(scan.nextLine());
-				if (userInput >= 1 && userInput <= 100) break;
+				if (userInput >= 1 && userInput <= 99) break;
 				out.println(ConsoleColour.RED + "Invalid value. Please try again");
 			} catch (Exception e) {
 				out.println(ConsoleColour.RED + "Invalid value. Please try again");
@@ -167,13 +167,13 @@ public class Menu {
 	
 	// Start similarity search based on specified parameters
 	private void runSimilaritySearch() {
-		// If text not specified, stop execution and display an error message
+		// If no word or text, stop execution and display an error message
 		if (textToCompare == null) {
-			errorMsg = "Text is not specified";
+			errorMsg = "Text is not defined!";
 			return;
 		}
 		// Create an instance of 'EmbeddingsProcessor'
-		EmbeddingsProcessor processor = new EmbeddingsProcessor(textToCompare, measure);
+		EmbeddingsProcessor processor = new EmbeddingsProcessor(textToCompare, metric);
 		try {
 			// Pass in the rest of configuration variables to start processing
 			processor.start(embeddingsFilePath, outputFilePath, numOfMatches);
@@ -206,11 +206,11 @@ public class Menu {
 		if (textToCompare == null) {
 			out.println("(3) Enter a Word or Text");
 		} else {
-			out.println("(3) Enter a Word or Text    ----> Text used for similarity search: "
+			out.println("(3) Enter a Word or Text    ----> Text to analyse: " 
 					+ ConsoleColour.GREEN + textToCompare + ConsoleColour.WHITE);
 		}
-		// Display measure used for comparison
-		out.println("(4) Select Distance Measure ----> Currently selected: " + ConsoleColour.GREEN + measure
+		// Display metric used for comparison
+		out.println("(4) Select Distance Metric  ----> Currently selected: " + ConsoleColour.GREEN + metric
 				+ ConsoleColour.WHITE);
 		// Number of matches option
 		out.println("(5) Number of Top Matches   ----> Currently set to: " + ConsoleColour.GREEN + numOfMatches

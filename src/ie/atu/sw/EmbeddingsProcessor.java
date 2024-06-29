@@ -13,16 +13,16 @@ public class EmbeddingsProcessor {
 	// I/O handling instance variables
 	private FileIO fileHandler;
 	private FileWriter out;
-	// Text, distance measure used for similarity search, and text analyzed
+	// Text, distance metric used for similarity search, and text analyzed
 	private String text;
-	private String measure;
+	private String metric;
 	private String postProcText;
 	
-	// Initialize file handler, text, measure and allocate memory for 'words' and 'embeddings' arrays
-	public EmbeddingsProcessor(String text, String measure) {
+	// Initialize file handler, text, metric and allocate memory for 'words' and 'embeddings' arrays
+	public EmbeddingsProcessor(String text, String metric) {
 		this.fileHandler = new FileIO();
 		this.text = text;
-		this.measure = measure;
+		this.metric = metric;
 		this.words = new String[MAX_WORDS];
 		this.embeddings = new double[MAX_WORDS][VECTOR_DIMENSION];
 	}
@@ -31,20 +31,20 @@ public class EmbeddingsProcessor {
 	public void start(String embeddingsFilePath, String outputFilePath, int numOfMatches)
 			throws Exception {
 		
-		// Open BufferedReader to read the embeddings file, extract word embeddings and close the input stream
+		// Read the embeddings file with BufferedReader, extract embeddings and close the input stream
 		BufferedReader bReader = fileHandler.readFile(embeddingsFilePath);
 		extractWordEmbeddings(bReader);
 		bReader.close();
 		
 		// Pre-process the text. Create instances of TextProcessor
 		TextProcessor textProc = new TextProcessor(text, words, embeddings);
-		// Instantiate record that holds vector, index of a word within 'words' array and text after processing
+		// Instantiate record that holds vector, index of a word from 'words' array and processed text
 		ProcessedText processedText = textProc.processText();
 		double[] vector = processedText.vector();
 		int indexOfWord = processedText.index();
 		postProcText = processedText.postProcText();
 		
-		// Set up the output stream
+		// Create a file output stream
 		out = fileHandler.writeToFile(outputFilePath);
 		
 		// Start vector comparison and compute similarity scores
@@ -80,14 +80,14 @@ public class EmbeddingsProcessor {
 	 */
 	private void processResults(String[] topWords, double[] topScores) throws IOException {
 		System.out.println("\n");
-		printAndWrite("* Scores represent " + measure + " between vectors\n");
+		printAndWrite("* Scores represent " + metric + " between vectors\n");
 		printAndWrite("* Original text: - " + text + " -\n");
-		printAndWrite("* Analyzed text: - " + postProcText + " -\n");
+		printAndWrite("* Analysed text: - " + postProcText + " -\n");
 		printAndWrite("  ==========================================\n");
 		printAndWrite("   Top Matching Words |  Similarity Scores\n");
 		printAndWrite("  ====================|=====================\n");
 		for (int i = 0; i < topWords.length; i++) {
-			String row = String.format("%3s%-19s%-3s%s%n", "", topWords[i], "|", topScores[i]);
+			String row = String.format("  %-4s%-16s|  %s%n", (i+1) + ".", topWords[i], topScores[i]);
 			printAndWrite(row);
 		}
 	}
@@ -96,12 +96,12 @@ public class EmbeddingsProcessor {
 	private void insertIntoArr(double[] topScores, String[] topWords, double newScore, String newWord) {
 		int i = 0;
 		// Euclidean distance (smaller values indicate greater similarity between vectors)
-		if (measure.equals("Euclidean Distance")) {
+		if (metric.equals("Euclidean Distance")) {
 			// Return unless newScore is smaller than the largest (last) element of the 'topScores' array
 			if (newScore > topScores[topScores.length-1]) return;
-			// If 'i' larger than zero, and 'topScores' previous element larger than new score
+			// If 'i' larger than zero, and 'topScores' prior element larger than new score
 			for (i = topScores.length - 1; i > 0 && topScores[i - 1] > newScore; i--) {
-				// Overwrite current element with the previous one - drop largest (last) element
+				// Overwrite current element with the previous one - take out largest (last) element
 				topScores[i] = topScores[i - 1];
 				topWords[i] = topWords[i - 1];
 			} 
@@ -109,9 +109,9 @@ public class EmbeddingsProcessor {
 		} else {
 			// Return unless newScore is larger than the smallest (last) element of the 'topScores' array
 			if (newScore < topScores[topScores.length-1]) return; 
-			// If 'i' larger than 0, and 'topScores' previous element smaller than new score
+			// If 'i' larger than 0, and 'topScores' prior element smaller than new score
 			for (i = topScores.length - 1; i > 0 && topScores[i - 1] < newScore; i--) {
-				// Overwrite current element with the previous one - drop smallest (last) element
+				// Overwrite current element with the previous one - take out smallest (last) element
 				topScores[i] = topScores[i - 1];
 				topWords[i] = topWords[i - 1];
 			}
@@ -121,11 +121,11 @@ public class EmbeddingsProcessor {
 		topWords[i] = newWord;
 	}
 	
-	// Fill array with infinities so first 'n' number of calculated scores can be added
+	// Fill array with infinities so first n number of calculated scores can be added
 	private double[] populateArr(int numOfMatches) {
 		double[] arr = new double[numOfMatches];
 		// For euclidean distance use +inifinity since smaller values indicate greater similarity
-		if (measure.equals("Euclidean Distance")) {
+		if (metric.equals("Euclidean Distance")) {
 			Arrays.fill(arr, Double.POSITIVE_INFINITY);
 		} else {
 			Arrays.fill(arr, Double.NEGATIVE_INFINITY);
@@ -145,10 +145,10 @@ public class EmbeddingsProcessor {
 			if (indexOfWord == i) {
 				continue;
 			}
-			// Initialize 'simScore' variable that stores result of comparison between two vectors
+			// Initialize 'simScore' variable to store result of comparison between two vectors
 			double simScore = 0.0;
 			// Calculate similarity between vector at the current index of 'embeddings' and input vector
-			switch (measure) {
+			switch (metric) {
 				case "Dot Product" 		  -> {
 					simScore = dotProduct(i, vector); 
 					}
@@ -159,7 +159,7 @@ public class EmbeddingsProcessor {
 					simScore = cosineSimilarity(i, vector);
 				}
 				default					  -> {
-					throw new Exception("Unsupported method: " + measure);
+					throw new Exception("Unsupported method: " + metric);
 				}
 			}
 			// Insert simScore and a related word into a proper place in 'topScores' and 'topWords' arrays

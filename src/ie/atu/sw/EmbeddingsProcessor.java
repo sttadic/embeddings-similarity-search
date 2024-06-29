@@ -13,7 +13,7 @@ public class EmbeddingsProcessor {
 	// I/O handling instance variables
 	private FileIO fileHandler;
 	private FileWriter out;
-	// Text and distance measure used for similarity search
+	// Text, distance measure used for similarity search, and text analyzed
 	private String text;
 	private String measure;
 	private String postProcText;
@@ -36,15 +36,13 @@ public class EmbeddingsProcessor {
 		extractWordEmbeddings(bReader);
 		bReader.close();
 		
-		// Pre-process the text. Create instances of TextProcessor and ProcessedText
-		TextProcessor tp = new TextProcessor(text, words, embeddings);
-		ProcessedText pt = tp.processText();
-		// Vector of a single word or average vector of multiple words
-		double[] vector = pt.vector();
-		// Index of a word within 'words' ('embeddings') array, or -1 if average vector is calculated
-		int indexOfWord = pt.index();
-		// Assign what is left of original text after processing to 'postProcText' variable
-		postProcText = pt.postProcText();
+		// Pre-process the text. Create instances of TextProcessor
+		TextProcessor textProc = new TextProcessor(text, words, embeddings);
+		// Instantiate record that holds vector, index of a word within 'words' array and text after processing
+		ProcessedText processedText = textProc.processText();
+		double[] vector = processedText.vector();
+		int indexOfWord = processedText.index();
+		postProcText = processedText.postProcText();
 		
 		// Set up the output stream
 		out = fileHandler.writeToFile(outputFilePath);
@@ -83,8 +81,8 @@ public class EmbeddingsProcessor {
 	private void processResults(String[] topWords, double[] topScores) throws IOException {
 		System.out.println("\n");
 		printAndWrite("* Scores represent " + measure + " between vectors\n");
-		printAndWrite("* Input text: - " + text + " -\n");
-		printAndWrite("* Words used: - " + postProcText + " -\n");
+		printAndWrite("* Original text: - " + text + " -\n");
+		printAndWrite("* Analyzed text: - " + postProcText + " -\n");
 		printAndWrite("  ==========================================\n");
 		printAndWrite("   Top Matching Words |  Similarity Scores\n");
 		printAndWrite("  ====================|=====================\n");

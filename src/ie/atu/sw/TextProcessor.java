@@ -46,8 +46,11 @@ public class TextProcessor {
 	private String[] preProcessor() {
 		// Split the text into words using space as a delimiter
 		String[] parts = text.split(" ");
-		// Return array if only one element in 'parts' array
-		if (parts.length == 1) return parts;
+		// If only one element in 'parts' array, assign it to 'postProcText' and return array
+		if (parts.length == 1) {
+			postProcText = parts[0];
+			return parts;
+		}
 		// Create an instance of StringBuilder to accumulate the matching words
 		StringBuilder sbNoStopWords = new StringBuilder();
 		// Iterate over the 'parts' array and compare each word against a word from 'words' array

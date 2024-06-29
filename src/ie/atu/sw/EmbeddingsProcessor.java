@@ -55,16 +55,27 @@ public class EmbeddingsProcessor {
 	}
 	
 	// Extract elements from each line of input stream and store them into relevant arrays
-	private void extractWordEmbeddings(BufferedReader br) throws IOException {
+	private void extractWordEmbeddings(BufferedReader br) throws Exception {
+		// First line of of input stream is empty
+		if (br.readLine() == null) {
+			throw new Exception("Word embeddings file is empty!");
+		}
 		int i = 0;
 		String line = null;
+		// Iterate over input stream line by line
 		while ((line = br.readLine()) != null) {
-			String[] parts = line.trim().split(",");
-			words[i] = parts[0];
-			for (int j = 1; j <= 50; j++) {
-				embeddings[i][j-1] = Double.parseDouble(parts[j]);
+			try {
+				// Use comma as delimiter to split the lines of text and trim whitespace
+				String[] parts = line.trim().split(",");
+				// Store elements into arrays
+				words[i] = parts[0];
+				for (int j = 1; j <= 50; j++) {
+					embeddings[i][j-1] = Double.parseDouble(parts[j]);
+				}
+				i++;
+			} catch (Exception e) {
+				throw new Exception("Error reading word embeddings file!");
 			}
-			i++;
 		}
 	}
 	

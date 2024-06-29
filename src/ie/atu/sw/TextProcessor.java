@@ -4,7 +4,7 @@ public class TextProcessor {
 	private String text;
 	private String[] words;
 	private double[][] embeddings;
-	private String postProcText;
+	private String procText;
 	
 	// Initialize instance variables
 	public TextProcessor(String text, String[] words, double[][] embeddings) {
@@ -13,7 +13,7 @@ public class TextProcessor {
 		this.embeddings = embeddings;
 	}
 	
-	// Process text and return a record holding a vector and its index within word embeddings
+	// Process text and return a record holding a vector, its index within words array and processed text
 	public ProcessedText processText() throws Exception {
 		// Initialize array to hold calculated vector and variable to store its index
 		double[] vector = new double[EmbeddingsProcessor.VECTOR_DIMENSION];
@@ -31,24 +31,24 @@ public class TextProcessor {
 				throw new Exception("The word(s) '" + text
 						+ "' could not be found in embeddings! Please try another word(s) or check your spelling");
 			}
-			// Store vector representing the word from 2D array 'embeddings' based on indexOfWord
+			// Store a vector representing the word from 2D array 'embeddings' based on indexOfWord
 			vector = embeddings[indexOfWord];
 		// Multiple words left after pre-processing
 		} else {
 			// Store average vector
 			vector = averageVector(processedParts);
 		}
-		// Return vector, indexOfWord which value set to -1 if average vector is calculated, and text left for analysis
-		return new ProcessedText(vector, indexOfWord, postProcText);
+		// Return vector, indexOfWord which value set to -1 if average vector is calculated, and processed text
+		return new ProcessedText(vector, indexOfWord, procText);
 	}
 	
 	// Remove stop words. To simplify things, all words with no matches in embeddings array are removed
 	private String[] preProcessor() {
 		// Split the text into words using space as a delimiter
 		String[] parts = text.split(" ");
-		// If only one element in 'parts' array, assign it to 'postProcText' and return array
+		// If only one element in 'parts' array, assign it to 'procText' and return array
 		if (parts.length == 1) {
-			postProcText = parts[0];
+			procText = parts[0];
 			return parts;
 		}
 		// Create an instance of StringBuilder to accumulate the matching words
@@ -63,11 +63,11 @@ public class TextProcessor {
 				}
 			}
 		}
-		// Convert StringBuilder back to string, trim any trailing space and assign it to 'postProcText'
-		postProcText = sbNoStopWords.toString().trim();
+		// Convert StringBuilder back to string, trim any trailing space and assign it to 'procText'
+		procText = sbNoStopWords.toString().trim();
 		// Split the accumulated string into an array of words and return it
-		// If 'postProcText' is empty, splitting it will still return an array with 1 empty string element
-		return postProcText.split(" ");
+		// If 'procText' is empty, splitting it will still return an array with 1 empty string element
+		return procText.split(" ");
 	}
 	
 	// Return index of a word within embeddings array. Return -2 if no match found in 'words' array

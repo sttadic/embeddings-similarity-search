@@ -13,10 +13,10 @@ public class EmbeddingsProcessor {
 	// I/O handling instance variables
 	private FileIO fileHandler;
 	private FileWriter out;
-	// Text, distance metric used for similarity search, and text analyzed
+	// Text, distance metric used for similarity search, and text after processing
 	private String text;
 	private String metric;
-	private String postProcText;
+	private String procText;
 	
 	// Initialize file handler, text, metric and allocate memory for 'words' and 'embeddings' arrays
 	public EmbeddingsProcessor(String text, String metric) {
@@ -42,7 +42,7 @@ public class EmbeddingsProcessor {
 		ProcessedText processedText = textProc.processText();
 		double[] vector = processedText.vector();
 		int indexOfWord = processedText.index();
-		postProcText = processedText.postProcText();
+		procText = processedText.procText();
 		
 		// Create a file output stream
 		out = fileHandler.writeToFile(outputFilePath);
@@ -82,7 +82,7 @@ public class EmbeddingsProcessor {
 		System.out.println("\n");
 		printAndWrite("* Scores represent " + metric + " between vectors\n");
 		printAndWrite("* Original text: - " + text + " -\n");
-		printAndWrite("* Analysed text: - " + postProcText + " -\n");
+		printAndWrite("* Analysed text: - " + procText + " -\n");
 		printAndWrite("  ==========================================\n");
 		printAndWrite("   Top Matching Words |  Similarity Scores\n");
 		printAndWrite("  ====================|=====================\n");

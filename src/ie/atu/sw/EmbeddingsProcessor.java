@@ -13,7 +13,7 @@ public class EmbeddingsProcessor {
 	// I/O handling instance variables
 	private FileIO fileHandler;
 	private FileWriter out;
-	// Text, distance metric used for similarity search, and text after processing
+	// Text, metric (vector comparison algorithm), and text after processing
 	private String text;
 	private String metric;
 	private String procText;
@@ -172,7 +172,7 @@ public class EmbeddingsProcessor {
 					simScore = cosineSimilarity(i, vector);
 				}
 				default					  -> {
-					throw new Exception("Unsupported method: " + metric);
+					throw new Exception("Unsupported comparison algorithm: " + metric);
 				}
 			}
 			// Insert simScore and a related word into a proper place in 'topScores' and 'topWords' arrays

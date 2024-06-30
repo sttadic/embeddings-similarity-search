@@ -62,7 +62,7 @@ public class Menu {
 		String userInput;
 		while (true) {
 			out.println(ConsoleColour.WHITE);
-			out.print("Please specify the path and the name of the word embeddings file > ");
+			out.print("Please specify the file path and name of the word embeddings > ");
 			userInput = scan.nextLine().trim();
 			// Prevent empty input string
 			if (userInput.isEmpty()) {
@@ -80,7 +80,7 @@ public class Menu {
 		String userInput;
 		while (true) {
 			out.println(ConsoleColour.WHITE);
-			out.print("Please specify the path and the name of a file where results will be stored > ");
+			out.print("Please enter the file path and name where the results should be saved > ");
 			userInput = scan.nextLine().trim();
 			// Prevent empty input string
 			if (userInput.isEmpty()) {
@@ -115,12 +115,12 @@ public class Menu {
 		textToCompare = userInput;
 	}
 	
-	// Method that defines metric to be used for similarity search
+	// Method that defines similarity metric
 	private void setMetric() {
 		clearScreen();
 		out.println(ConsoleColour.WHITE_BOLD);
-		out.println("Select a metric you would like to use to find the closest matches to your input");
-		out.print("*******************************************************************************");
+		out.println("Select the vector comparison algorithm to find the closest matches to your input");
+		out.print("********************************************************************************");
 		out.println(ConsoleColour.WHITE);
 		out.println("(1) Dot Product");
 		out.println("(2) Euclidean Distance");
@@ -138,7 +138,7 @@ public class Menu {
 				out.println(ConsoleColour.RED + "Invalid input! Please try again.");
 			}
 		}
-		// Set the distance metric based on user input (default to Cosine Similarity)
+		// Set the similarity metric based on user input (default to Cosine Similarity)
 		switch (metricChoice) {
 			case 1  -> metric = "Dot Product";
 			case 2  -> metric = "Euclidean Distance";
@@ -197,28 +197,28 @@ public class Menu {
 		out.println("*                                                          *");
 		out.println("************************************************************");
 		// Display input file
-		out.println("(1) Specify Embedding File  ----> Currently set to: " + ConsoleColour.GREEN + embeddingsFilePath
+		out.println("(1) Specify Embedding File   ---> Currently set to: " + ConsoleColour.GREEN + embeddingsFilePath
 				+ ConsoleColour.WHITE);
 		// Display output file
-		out.println("(2) Specify an Output File  ----> Currently set to: " + ConsoleColour.GREEN + outputFilePath
+		out.println("(2) Specify an Output File   ---> Currently set to: " + ConsoleColour.GREEN + outputFilePath
 				+ ConsoleColour.WHITE);
 		// If set, show text used for similarity search
 		if (textToCompare == null) {
 			out.println("(3) Enter a Word or Text");
 		} else {
-			out.println("(3) Enter a Word or Text    ----> Text to analyse: " 
+			out.println("(3) Enter a Word or Text     ---> Text to compare: " 
 					+ ConsoleColour.GREEN + textToCompare + ConsoleColour.WHITE);
 		}
 		// Display metric used for comparison
-		out.println("(4) Select Distance Metric  ----> Currently selected: " + ConsoleColour.GREEN + metric
+		out.println("(4) Select Similarity Metric ---> Currently selected: " + ConsoleColour.GREEN + metric
 				+ ConsoleColour.WHITE);
 		// Number of matches option
-		out.println("(5) Number of Top Matches   ----> Currently set to: " + ConsoleColour.GREEN + numOfMatches
+		out.println("(5) Number of Top Matches    ---> Currently set to: " + ConsoleColour.GREEN + numOfMatches
 				+ ConsoleColour.WHITE);
 		// Option to start similarity search (coloured red if text not set yet)
 		if (textToCompare == null) {
 			out.println(ConsoleColour.RED
-					+ "(6) START SIMILARITY SEARCH (please ensure all parameters are set before proceeding)"
+					+ "(6) START SIMILARITY SEARCH (Enter a word or short sentence to proceed)"
 					+ ConsoleColour.WHITE);
 		} else {
 			out.println("(6) START SIMILARITY SEARCH");

@@ -36,6 +36,9 @@ public class EmbeddingsProcessor {
 		extractWordEmbeddings(bReader);
 		bReader.close();
 		
+		// Throw an exception in case nothing was extracted from word embeddings file
+		if (words[0] == null) throw new Exception("Word embeddings file is empty!");
+		
 		// Create instance of TextProcessor and process the input text
 		TextProcessor textProc = new TextProcessor(text, words, embeddings);
 		// Instantiate record that holds vector, index of a word from 'words' array, and processed text
@@ -56,11 +59,6 @@ public class EmbeddingsProcessor {
 	
 	// Extract elements from each line of input stream and store them into relevant arrays
 	private void extractWordEmbeddings(BufferedReader br) throws Exception {
-		// First line of of input stream is empty
-		if (br.readLine() == null) {
-			br.close();
-			throw new Exception("Word embeddings file is empty!");
-		}
 		int i = 0;
 		String line = null;
 		// Iterate over input stream line by line
@@ -170,6 +168,8 @@ public class EmbeddingsProcessor {
 				}
 				case "Cosine Similarity"  -> {
 					simScore = cosineSimilarity(i, vector);
+					// Skip current iteration of a loop if 'NaN' is returned
+					if (Double.isNaN(simScore)) continue;
 				}
 				default					  -> {
 					throw new Exception("Unsupported comparison algorithm: " + metric);
@@ -205,16 +205,20 @@ public class EmbeddingsProcessor {
 	
 	// Cosine Similarity of vectors
 	private double cosineSimilarity(int index, double[] vector) {
+		double dotProd = 0.0;
 		double sumInputVec = 0.0;
 		double sumEmbedVec = 0.0;
-		// Calculate sum of squares of vector elements
+		// Calculate dot product and sum of squares of vector elements
 		for (int i = 0; i < VECTOR_DIMENSION; i++) {
+			dotProd += vector[i] * embeddings[index][i];
 			sumInputVec += Math.pow(vector[i], 2);
 			sumEmbedVec += Math.pow(embeddings[index][i], 2);
 		}
 		// Square root of product of vectors
 		double sqRootOfProd = Math.sqrt(sumInputVec * sumEmbedVec);
+		// Avoid possible division by zero by returning 'NaN' as a flag
+		if (sqRootOfProd == 0.0) return Double.NaN;
 		// Return cosine similarity (quotient of dot product and 'sqRootOfProd') 
-		return dotProduct(index, vector) / sqRootOfProd;
+		return dotProd / sqRootOfProd;
 	}
 }

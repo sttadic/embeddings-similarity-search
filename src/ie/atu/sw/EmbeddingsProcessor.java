@@ -51,7 +51,15 @@ public class EmbeddingsProcessor {
 		out = fileHandler.writeToFile(outputFilePath);
 		
 		// Start vector comparison and compute similarity scores
-		computeSimScores(vector, numOfMatches, indexOfWord);
+		if (metric.equals("All")) {
+			String[] allMetrics = {"Dot Product", "Euclidean Distance", "Cosine Similarity"};
+			for (String m : allMetrics) {
+				metric = m;
+				computeSimScores(vector, numOfMatches, indexOfWord);
+			}
+		} else {
+			computeSimScores(vector, numOfMatches, indexOfWord);
+		}
 		
 		// Close output stream
 		out.close();
@@ -101,6 +109,7 @@ public class EmbeddingsProcessor {
 			String row = String.format("  %-4s%-16s|  %s%n", (i+1) + ".", topWords[i], topScores[i]);
 			printAndWrite(row);
 		}
+		printAndWrite("  ==========================================\n\n");
 	}
 	
 	// Insert similarity scores and corresponding words into arrays in sorted order

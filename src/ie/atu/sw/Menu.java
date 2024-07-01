@@ -125,24 +125,26 @@ public class Menu {
 		out.println("(1) Dot Product");
 		out.println("(2) Euclidean Distance");
 		out.println("(3) Cosine Similarity");
+		out.println("(4) All");
 		out.println();
 		// Initialize metricChoice variable and handle user input
 		int metricChoice = 0;
 		while (true) {
-			out.print(ConsoleColour.WHITE_BOLD + "Select Option (1-3) > ");
+			out.print(ConsoleColour.WHITE_BOLD + "Select Option (1-4) > ");
 			try {
 				metricChoice = Integer.parseInt(scan.nextLine());
-				if (metricChoice >= 1 && metricChoice <= 3) break;
+				if (metricChoice >= 1 && metricChoice <= 4) break;
 				out.println(ConsoleColour.RED + "Invalid input! Please try again.");
 			} catch (Exception e) {
 				out.println(ConsoleColour.RED + "Invalid input! Please try again.");
 			}
 		}
-		// Set the similarity metric based on user input (default to Cosine Similarity)
+		// Set the similarity metric based on user input
 		switch (metricChoice) {
 			case 1  -> metric = "Dot Product";
 			case 2  -> metric = "Euclidean Distance";
-			default -> metric = "Cosine Similarity";
+			case 3  -> metric = "Cosine Similarity";
+			default -> metric = "All";
 		}
 	}
 	

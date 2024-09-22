@@ -1,11 +1,11 @@
 # Java Application - Similarity Search with Word Embeddings
-Final project for the Object Oriented Software Development module - Higher Diploma in Software Development. <br>
+Final project for the Object-Oriented Software Development module - Higher Diploma in Software Development. <br>
 Author: Stjepan Tadic
 
 <br>
 
 ## Description
-This Java application performs similarity search between words. Users can input a word or a short sentence, and the application will calculate similarity between the corresponding vectors based on the selected metric (vector comparison algorithm). The program returns the closest matches from a predefined set of word embeddings (GloVe embeddigs reduced to 59602 words).
+This Java application performs a similarity search between words. Users can input a word or a short sentence, and the application will calculate the similarity between the corresponding vectors based on the selected metric (vector comparison algorithm). The program returns the closest matches from a predefined set of word embeddings (GloVe embeddings reduced to 59602 words). As a part of the project requirements, only 'regular arrays' were allowed, ensuring a fundamental understanding of lower-level data structures.
 
 <br>
 

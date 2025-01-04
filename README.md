@@ -1,4 +1,4 @@
-# Java Application - Similarity Search with Word Embeddings
+# Similarity Search with Word Embeddings
 Final project for the Object-Oriented Software Development module - Higher Diploma in Software Development. <br>
 Author: Stjepan Tadic
 
